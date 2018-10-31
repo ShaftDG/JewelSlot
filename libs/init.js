@@ -36,7 +36,7 @@ if (BABYLON.Engine.isSupported()) {
 
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
-        var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_4k.hdr", scene, 512, false, false) ;
+        var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_2k.hdr", scene, 512, false, false) ;
         var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000);
         hdrTexture1.rotationY = skyBox.rotation.y = -0.1;
 
@@ -44,21 +44,8 @@ if (BABYLON.Engine.isSupported()) {
         var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
         texturesJewel.push(microSurfaceTexture.clone());
 
-      /*  var baseColorTextureMinusBet = new BABYLON.Texture("models/1/Minus_buttonDown_baseColor.png", scene);
-        baseColorTextureMinusBet.uScale = 1;
-        baseColorTextureMinusBet.vScale = -1;
-        var normalTextureMinusBet = new BABYLON.Texture("models/1/Minus_buttonDown_normal.png", scene);
-        normalTextureMinusBet.uScale = 1;
-        normalTextureMinusBet.vScale = -1;
-        var baseColorTextureMaxBet = new BABYLON.Texture("models/1/MaxBet_buttonUp_baseColor.png", scene);
-        baseColorTextureMaxBet.uScale = 1;
-        baseColorTextureMaxBet.vScale = -1;
-        var normalTextureMaxBet = new BABYLON.Texture("models/1/MaxBet_buttonUp_normal.png", scene);
-        normalTextureMaxBet.uScale = 1;
-        normalTextureMaxBet.vScale = -1;*/
-        // var textureNumber = new BABYLON.Texture("textures/numbers/numbers.png", scene);
-        var credit = new TextLabel( new BABYLON.Vector3(15, -15, 3), scene);
-        var roundScore = new TextLabel( new BABYLON.Vector3(-15, -15, 3), scene);
+        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene);
+        var roundScore = new TextLabel( new BABYLON.Vector3(-17, -15, 3), scene);
 
         var plastic = new BABYLON.PBRMaterial("plastic", scene);
         plastic.reflectionTexture = hdrTexture;
@@ -120,7 +107,7 @@ if (BABYLON.Engine.isSupported()) {
         defaultPipeline.imageProcessing.exposure = 0.5;
         //
         defaultPipeline.bloomEnabled = true;
-        defaultPipeline.bloomKernel = 200;
+        defaultPipeline.bloomKernel = 100;
         defaultPipeline.bloomWeight = 0.2;
         defaultPipeline.bloomThreshold = 0.1;
         defaultPipeline.bloomScale = 0.1;
@@ -221,10 +208,12 @@ if (BABYLON.Engine.isSupported()) {
             newMeshes[0].position.z = -29;
             newMeshes[0].scaling = new BABYLON.Vector3(-5, 5, 5);
 
-            newMeshes.map(v => {
-              //  shadowGenerator.addShadowCaster(v);
+            newMeshes[0]._children.map(v => {
+                v.material.reflectionTexture = hdrTexture;
+                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lock") !== -1 })[0]);
+                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondLeft") !== -1 })[0]);
+                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondRight") !== -1 })[0]);
                 v.receiveShadows = true;
-               // v.scaling = new BABYLON.Vector3(4, 4, 4);
                //   console.log(v.name);
             });
 
@@ -244,29 +233,17 @@ if (BABYLON.Engine.isSupported()) {
                 showRoundScore = true;
             });
 
-            var optionAutoPlayButton = {
+            var optionSecondButton = {
                 deltaPush: -0.05
             };
 
-            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[4], newMeshes[9], optionAutoPlayButton, manager);
+            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[4], newMeshes[9], optionSecondButton, manager);
 
-            var optionPlusBetButton = {
-                deltaPush: -0.05
-            };
+            var plusBetButton = MakeButton("plusBetButton", newMeshes[3], newMeshes[9], optionSecondButton, manager);
 
-            var plusBetButton = MakeButton("plusBetButton", newMeshes[3], newMeshes[9], optionPlusBetButton, manager);
+            var minusBetButton = MakeButton("minusBetButton", newMeshes[5], newMeshes[10], optionSecondButton, manager);
 
-            var optionMinusBetButton = {
-                deltaPush: -0.05
-            };
-
-            var minusBetButton = MakeButton("minusBetButton", newMeshes[5], newMeshes[10], optionMinusBetButton, manager);
-
-            var optionMaxBetButton = {
-                deltaPush: -0.05
-            };
-
-            var maxBetButton = MakeButton("maxBetButton", newMeshes[2], newMeshes[10], optionMaxBetButton, manager);
+            var maxBetButton = MakeButton("maxBetButton", newMeshes[2], newMeshes[10], optionSecondButton, manager);
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
                 for (var i = 0; i < countRow; i++) {
@@ -276,7 +253,7 @@ if (BABYLON.Engine.isSupported()) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
                         shadowGenerator.addShadowCaster(mesh);
-                        var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 50, 0), false);
+                        var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
                         DropJewel.call(obj, scene, startButton, new BABYLON.Vector3(-x, -y, 0));
                     }
                 }
