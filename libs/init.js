@@ -44,18 +44,18 @@ if (BABYLON.Engine.isSupported()) {
         var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
         texturesJewel.push(microSurfaceTexture.clone());
 
-        var baseColorTextureStart = new BABYLON.Texture("models/button/start/button_baseColor.png", scene);
-        baseColorTextureStart.uScale = 1;
-        baseColorTextureStart.vScale = -1;
-        var normalTextureStart = new BABYLON.Texture("models/button/start/button_normal.png", scene);
-        normalTextureStart.uScale = 1;
-        normalTextureStart.vScale = -1;
-        var baseColorTextureStop = new BABYLON.Texture("models/button/stop/button_baseColor.png", scene);
-        baseColorTextureStop.uScale = 1;
-        baseColorTextureStop.vScale = -1;
-        var normalTextureStop = new BABYLON.Texture("models/button/stop/button_normal.png", scene);
-        normalTextureStop.uScale = 1;
-        normalTextureStop.vScale = -1;
+      /*  var baseColorTextureMinusBet = new BABYLON.Texture("models/1/Minus_buttonDown_baseColor.png", scene);
+        baseColorTextureMinusBet.uScale = 1;
+        baseColorTextureMinusBet.vScale = -1;
+        var normalTextureMinusBet = new BABYLON.Texture("models/1/Minus_buttonDown_normal.png", scene);
+        normalTextureMinusBet.uScale = 1;
+        normalTextureMinusBet.vScale = -1;
+        var baseColorTextureMaxBet = new BABYLON.Texture("models/1/MaxBet_buttonUp_baseColor.png", scene);
+        baseColorTextureMaxBet.uScale = 1;
+        baseColorTextureMaxBet.vScale = -1;
+        var normalTextureMaxBet = new BABYLON.Texture("models/1/MaxBet_buttonUp_normal.png", scene);
+        normalTextureMaxBet.uScale = 1;
+        normalTextureMaxBet.vScale = -1;*/
         // var textureNumber = new BABYLON.Texture("textures/numbers/numbers.png", scene);
         var credit = new TextLabel( new BABYLON.Vector3(15, -15, 3), scene);
         var roundScore = new TextLabel( new BABYLON.Vector3(-15, -15, 3), scene);
@@ -69,7 +69,7 @@ if (BABYLON.Engine.isSupported()) {
 
         var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 40), scene);
         camera.setTarget(new BABYLON.Vector3(0, -3.5, 0));
-        // camera.attachControl(canvas, false);
+        camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
         camera.upperRadiusLimit = 50;
@@ -101,18 +101,18 @@ if (BABYLON.Engine.isSupported()) {
         // Create default pipeline
         var defaultPipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [camera]);
         defaultPipeline.brightThreshold = 0.8;
-        // var curve = new BABYLON.ColorCurves();
-        // curve.globalHue = 200;
-        // curve.globalDensity = 80;
-        // curve.globalSaturation = 80;
-        // curve.highlightsHue = 20;
-        // curve.highlightsDensity = 80;
-        // curve.highlightsSaturation = -80;
-        // curve.shadowsHue = 2;
-        // curve.shadowsDensity = 80;
-        // curve.shadowsSaturation = 40;
-        // defaultPipeline.imageProcessing.colorCurves = curve;
-        // defaultPipeline.depthOfField.focalLength = 150;
+        var curve = new BABYLON.ColorCurves();
+        curve.globalHue = 200;
+        curve.globalDensity = 80;
+        curve.globalSaturation = 80;
+        curve.highlightsHue = 100;
+        curve.highlightsDensity = 80;
+        curve.highlightsSaturation = -80;
+        curve.shadowsHue = 2;
+        curve.shadowsDensity = 80;
+        curve.shadowsSaturation = 40;
+        defaultPipeline.imageProcessing.colorCurves = curve;
+        defaultPipeline.depthOfField.focalLength = 150;
         //
         defaultPipeline.samples = 4;
         defaultPipeline.fxaaEnabled = true;
@@ -218,23 +218,21 @@ if (BABYLON.Engine.isSupported()) {
 
             newMeshes[0].name = "chest";
             newMeshes[0].position.y = -10.648;
-            newMeshes[0].position.z = -20.144;
-            newMeshes[0].scaling = new BABYLON.Vector3(8, 8, 8);
+            newMeshes[0].position.z = -29;
+            newMeshes[0].scaling = new BABYLON.Vector3(-5, 5, 5);
 
             newMeshes.map(v => {
               //  shadowGenerator.addShadowCaster(v);
                 v.receiveShadows = true;
-                // console.log(v.name);
+               // v.scaling = new BABYLON.Vector3(4, 4, 4);
+               //   console.log(v.name);
             });
 
             var optionStartButton = {
-                position: new BABYLON.Vector3(0, 8 * (-0.815) - 10.648, 8 * (2.652) - 20.144),
-                rotation: new BABYLON.Vector3(-0.45378560552, 0, 0),
-                deltaPush: 0.1,
-                nameObject: "button"
+                deltaPush: 0.1
             };
-            newMeshes[8].scaling = new BABYLON.Vector3(8, 8, 8);
-           var startButton = MakeButton("startButton", newMeshes[8], new BABYLON.Vector3(0, 0, -0.1), optionStartButton, manager);
+
+           var startButton = MakeButton("startButton", newMeshes[1], newMeshes[8], optionStartButton, manager);
 
             startButton.onPointerUpObservable.add(function () {
                 endScaling = false;
@@ -247,56 +245,28 @@ if (BABYLON.Engine.isSupported()) {
             });
 
             var optionAutoPlayButton = {
-                position: new BABYLON.Vector3(8 * (-0.754), 8 * (-0.709) - 10.648, 8 * (2.546) - 20.144),
-                rotation: new BABYLON.Vector3(-0.401425728, 0.41887902, -0.174532925),
-                deltaPush: 0.05,
-                nameObject: "buttonUp"
+                deltaPush: -0.05
             };
-            newMeshes[10].scaling = new BABYLON.Vector3(8, 8, 8);
-            var buttonUp = newMeshes[10].clone();
-            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[10], new BABYLON.Vector3(0, 0.08, -0.05), optionAutoPlayButton, manager);
+
+            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[4], newMeshes[9], optionAutoPlayButton, manager);
 
             var optionPlusBetButton = {
-                position: new BABYLON.Vector3(8 * (-0.754), 8 * (-0.709) - 10.648, 8 * (2.546) - 20.144),
-                rotation: new BABYLON.Vector3(-0.401425728, 0.41887902, -0.174532925),
-                deltaPush: -0.05,
-                nameObject: "buttonDown"
+                deltaPush: -0.05
             };
 
-            newMeshes[9].scaling = new BABYLON.Vector3(8, 8, 8);
-            var buttonDown = newMeshes[9].clone();
-            var plusBetButton = MakeButton("plusBetButton", newMeshes[9], new BABYLON.Vector3(0, -0.08, 0.05), optionPlusBetButton, manager);
-
-            newMeshes[7].name = "rightLock";
-            var leftLock = newMeshes[7].clone("leftLock");
-          /*  var localOrigin = localAxes(2);
-            localOrigin.parent = leftLock;*/
-            leftLock.scaling = new BABYLON.Vector3(8, 8, 8);
-            leftLock.parent = null;
-            leftLock.setPivotMatrix(BABYLON.Matrix.Translation(-0.754, 2.546, -0.709 ));
-            leftLock.rotate(BABYLON.Axis.X, -0.401425728, BABYLON.Space.WORLD);
-            leftLock.rotate(BABYLON.Axis.Y, -0.41887902+Math.PI, BABYLON.Space.WORLD);
-            leftLock.rotate(BABYLON.Axis.Z, 0, BABYLON.Space.WORLD);
-            leftLock.position = new BABYLON.Vector3(5.5, -13.5, -0.2);
-            leftLock.rotation = new BABYLON.Vector3(0.5, -0.4, 0.2);
+            var plusBetButton = MakeButton("plusBetButton", newMeshes[3], newMeshes[9], optionPlusBetButton, manager);
 
             var optionMinusBetButton = {
-                position: leftLock.position,
-                rotation: new BABYLON.Vector3(-0.5, -0.55, 0.215),
-                deltaPush: -0.05,
-                nameObject: "buttonDown"
+                deltaPush: -0.05
             };
 
-            var minusBetButton = MakeButton("minusBetButton", buttonDown, new BABYLON.Vector3(0.059, -0.39, -0.08), optionMinusBetButton, manager);
+            var minusBetButton = MakeButton("minusBetButton", newMeshes[5], newMeshes[10], optionMinusBetButton, manager);
 
             var optionMaxBetButton = {
-                position: leftLock.position,
-                rotation: new BABYLON.Vector3(-0.5, -0.55, 0.215),
-                deltaPush: 0.05,
-                nameObject: "buttonUp"
+                deltaPush: -0.05
             };
 
-            var maxBetButton = MakeButton("maxBetButton", buttonUp, new BABYLON.Vector3(-0.059, -0.22, 0.085), optionMaxBetButton, manager);
+            var maxBetButton = MakeButton("maxBetButton", newMeshes[2], newMeshes[10], optionMaxBetButton, manager);
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
                 for (var i = 0; i < countRow; i++) {
@@ -389,7 +359,7 @@ if (BABYLON.Engine.isSupported()) {
             scene.executeWhenReady(function () {
                 optimizer.start();
                 engine.hideLoadingUI();
-                OpenChest.call(newMeshes[11], new BABYLON.Vector3(Math.PI*0.9,0,0), 20);
+                OpenChest.call(newMeshes[11], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
                 credit.setTextForAnimation(genCombination.totalScore.toString());
             });
             // Wiring

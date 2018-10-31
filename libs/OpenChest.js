@@ -9,8 +9,8 @@ function OpenChest(targetRotation, duration)
 
         // Animation keys
         var keysTorus = [];
-        keysTorus.push({frame: 0, value: new BABYLON.Vector3(Math.PI/2,0,0)});
-        keysTorus.push({frame: 60, value: nextPos});
+        keysTorus.push({frame: 0, value: object.rotation.clone()});
+        keysTorus.push({frame: 30, value: nextPos});
         animationRotation.setKeys(keysTorus);
 
         var easingFunction = new BABYLON.CubicEase();
@@ -26,6 +26,6 @@ function OpenChest(targetRotation, duration)
 
         //Finally, launch animations on object, from key 0 to key 120 with loop activated
 
-        var anim = scene.beginAnimation(object, 0, 60, false, duration);
+        var anim = scene.beginAnimation(object, 0, 30, false, duration);
         return anim;
 };

@@ -42,7 +42,7 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                 }
         } else if (object.userData.inChest && dropInChest) {
             // if (!animationInChest) {
-                animationInChest = AnimationMoveInChest.call(object, new BABYLON.Vector3(object.position.x, -25, -15), 60);
+                animationInChest = AnimationMoveInChest.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60);
                 object.userData.inChest = false;
             // } else {
             //     animationInChest.onAnimationEnd = function () {
