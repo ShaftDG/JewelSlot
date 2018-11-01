@@ -5,6 +5,7 @@ if (BABYLON.Engine.isSupported()) {
     engine.disableManifestCheck = true;
 
     var genCombination = new GenerateWinCombination(5,3,12);
+
     var endScaling = false;
     var dropInChest = false;
     var allJewelsInChest = true;
@@ -219,6 +220,17 @@ if (BABYLON.Engine.isSupported()) {
         var halfLengthRow = (distanceBetweenSymbolRow * (countColl-1)) / 2;
         var halfLengthColl = (distanceBetweenSymbolColl * (countRow-1)) / 2;
 
+        var optionsWinLines = {
+            maskWinLine: genCombination.maskWinLine,
+            distanceBetweenSymbolRow: distanceBetweenSymbolRow,
+            distanceBetweenSymbolColl: distanceBetweenSymbolColl,
+            halfLengthRow: halfLengthRow,
+            halfLengthColl: halfLengthColl,
+            deltaBeginEnd: 7,
+            z: -0.75
+        };
+        var winLines = WinLines(optionsWinLines, scene);
+
         BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
 
             newMeshes[0].name = "chest";
@@ -274,7 +286,7 @@ if (BABYLON.Engine.isSupported()) {
                 unEnableButton(plusBetButton);
                 enableButton(minusBetButton);
             });
-            var plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[9], optionSecondButton, manager);
+            var plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[10], optionSecondButton, manager);
             plusBetButton.onPointerUpObservable.add(function () {
                 genCombination.toIncreaseBet();
                 bet.setTextForAnimation(genCombination.bet.toString());
@@ -283,7 +295,7 @@ if (BABYLON.Engine.isSupported()) {
                     unEnableButton(plusBetButton);
                 }
             });
-            var minusBetButton = MakeButton("minusBetButton", newMeshes[2], newMeshes[10], optionSecondButton, manager);
+            var minusBetButton = MakeButton("minusBetButton", newMeshes[2], newMeshes[9], optionSecondButton, manager);
             unEnableButton(minusBetButton);
             minusBetButton.onPointerUpObservable.add(function () {
                 genCombination.reduceBet();
@@ -294,10 +306,10 @@ if (BABYLON.Engine.isSupported()) {
                 }
             });
 
+
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
-
                     for (var j = 0; j < countColl; j++) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
@@ -416,6 +428,7 @@ if (BABYLON.Engine.isSupported()) {
         scene.registerBeforeRender(function () {
             if (mapLineWin.size && endScaling) {
                 var indexLine = mapLineWin.entries().next().value[0];
+                var objWineline =  winLines.filter((v, i) => i === indexLine)[0];
                 if (mapLineWin.has(indexLine)) {
                     var mapObjs = mapLineWin.get(indexLine);
                     if (mapObjs.moveForward) {
@@ -425,6 +438,7 @@ if (BABYLON.Engine.isSupported()) {
                             console.log(totalRound);
                             roundScore.setTextForAnimation(totalRound.toString());
                         }
+                        objWineline.setEnabled(true);
                         mapObjs.array.map(v =>{
                             var animation = AnimationMoveForward.call(v, new BABYLON.Vector3(v.position.x, v.position.y, 5), 60);
                             animation.onAnimationEnd = function () {
@@ -437,13 +451,22 @@ if (BABYLON.Engine.isSupported()) {
                     } else if (mapObjs.moveBack) {
                         mapLineWin.delete(indexLine);
                         if (mapLineWin.size) {
+                            objWineline.setEnabled(false);
                             indexLine = mapLineWin.entries().next().value[0];
                         } else {
-                            endScaling = false;
-                            dropInChest = true;
-                            roundScore.zeroing();
-                            genCombination.gettingWinnings();
-                            credit.setTextForAnimation(genCombination.totalScore);
+                            winLines.map((v, i) => {
+                                genCombination.numWinSymbline[i] ? v.setEnabled(true) : v.setEnabled(false);
+                                v.renderingGroupId = 1;
+                            });
+                            setTimeout(() => {
+                                endScaling = false;
+                                dropInChest = true;
+                                roundScore.zeroing();
+                                genCombination.gettingWinnings();
+                                credit.setTextForAnimation(genCombination.totalScore);
+                                winLines.map(v => {v.setEnabled(false); v.renderingGroupId = 0;});
+                            }, 1000);
+
                         }
                     }
                 }
