@@ -7,16 +7,12 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
     // this.totalRound = 0;
 
     this.bet = 10;
+    this.maxBet = 1000;
+    this.minBet = 10;
+    this.isMaxBet = false;
+    this.isMinBet = true;
 
     this.totalScore = 250250;
-
-    this.numSymbline = [ 0, 0, 0, 0, 0 ];
-
-    this.numWinSymbline = [ 0, 0, 0, 0, 0 ];
-
-    this.firstSymbline = [ 0, 0, 0, 0, 0 ];
-
-    this.winLineNum = 5;
 
     this.stopPositionArray = [];
 
@@ -72,24 +68,45 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         this.moveArrayFreeSpinSymb[j] = [];
     }
 
+    this.maskWinLine = [
+        [1,1,1,1,1],
+        [0,0,0,0,0],
+        [2,2,2,2,2],
+        [0,1,2,1,0],
+        [2,1,0,1,2],
+        [0,0,1,0,0],
+        [2,2,1,2,2]
+    ];
+
+    this.winLineNum = this.maskWinLine.length;
+
+    this.numSymbline = [];
+    for (var j = 0; j < this.winLineNum; j++ ) {
+        this.numSymbline[j] = 0;
+    }
+
+    this.numWinSymbline = [];
+    for (var j = 0; j < this.winLineNum; j++ ) {
+        this.numWinSymbline[j] = 0;
+    }
+
+    this.firstSymbline = [];
+    for (var j = 0; j < this.winLineNum; j++ ) {
+        this.firstSymbline[j] = 0;
+    }
+
     this.winLineArray = [];
     for (var j = 0; j < this.winLineNum; j++ ) {
         this.winLineArray[j]=[];
     }
 
     this.moveArray = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
-            this.moveArray[j] = [
-                []
-            ];
-    }
-
-    for (var j = 0; j < this.winLineNum; j++ ) {
-        for (var k = 0; k < this.numCilinder; k++ ) {
-          this.moveArray[j][k] = [0, 0, 0];
+    for (var j = 0; j < this.maskWinLine.length; j++ ) {
+        this.moveArray[j] = [];
+        for (var i = 0; i < this.maskWinLine[j].length; i++ ) {
+            this.moveArray[j][i] = [0, 0, 0];
         }
     }
-  //  console.log("123", this.moveArray);
 }
 
 GenerateWinCombination.prototype.constructor = GenerateWinCombination;
@@ -106,7 +123,28 @@ GenerateWinCombination.prototype.placeBet = function() {
 
 GenerateWinCombination.prototype.gettingWinnings = function() {
     this.totalScore += this.getTotalRound();
-    this.numSymbline = [ 0, 0, 0, 0, 0 ];
+    this.numSymbline = [];
+    for (var j = 0; j < this.winLineNum; j++ ) {
+        this.numSymbline[j] = 0;
+    }
+};
+
+GenerateWinCombination.prototype.toIncreaseBet = function() {
+   this.bet = this.bet < this.maxBet * 0.1 ? this.bet += 10 : this.bet < this.maxBet * 0.5 ? this.bet += 50 : this.bet < this.maxBet ? this.bet += 100 : this.maxBet;
+   this.isMaxBet = this.bet === this.maxBet;
+   this.isMinBet = false;
+};
+
+GenerateWinCombination.prototype.reduceBet = function() {
+    this.bet = this.bet > this.maxBet * 0.5 ? this.bet -= 100 : this.bet > this.maxBet * 0.1 ? this.bet -= 50 : this.bet > this.minBet ? this.bet -= 10 : this.minBet;
+    this.isMinBet = this.bet === this.minBet;
+    this.isMaxBet = false;
+};
+
+GenerateWinCombination.prototype.setMaxBet = function() {
+    this.bet = this.maxBet;
+    this.isMaxBet = true;
+    this.isMinBet = false;
 };
 
 GenerateWinCombination.prototype.generate = function() {
@@ -141,176 +179,48 @@ GenerateWinCombination.prototype.generate = function() {
     console.log("Stop Position Array", this.stopPositionArray);
     // console.log("this.arrayCombination", this.arrayCombination);
     this.winLine(this.arrayCombination);
-    this.winlineRound();
+    this.winLineRound();
     this.moveWinLine();
     return this.arrayCombination;
 };
 
 GenerateWinCombination.prototype.winLine = function(arrayCombination) {
-    this.arrayCombination = arrayCombination;
-    var length = this.numCilinder-1;
-    for (var j = 0; j < this.winLineNum; j++ ) {
-        if (j == 0) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                this.winLineArray[j][i] = this.arrayCombination[i][1];
-            }
-        } else if (j == 1) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                this.winLineArray[j][i] = this.arrayCombination[i][0];
-            }
-        } else if (j == 2) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                this.winLineArray[j][i] = this.arrayCombination[i][2];
-            }
-        } else if (j == 3) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                this.winLineArray[j][i] = this.arrayCombination[i][Math.abs(Math.abs(length - i - (length / 2)) - (length / 2))];
-            }
-        } else if (j == 4) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                this.winLineArray[j][i] = this.arrayCombination[i][Math.abs(length - i - (length / 2))];
-            }
+    for (var j = 0; j < this.maskWinLine.length; j++ ) {
+        for (var i = 0; i < this.maskWinLine[j].length; i++) {
+            this.winLineArray[j][i] = arrayCombination[i][this.maskWinLine[j][i]];
         }
     }
+
     console.log("Line Array", this.winLineArray);
 };
 
-GenerateWinCombination.prototype.winlineRound = function() {
-
-    for (var j = 0; j < this.winLineNum; j++ ) {
-        if (j == 0) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                if (i > 0) {
-                    if (this.winLineArray[j][i] == this.winLineArray[j][i - 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
-                        this.numSymbline[j] ++;
-                    } else {
-                        break;
-                    }
-                } else if (i == 0 /*&& this.winLineArray[j][i] != this.freeSpinSymb*/) {
-                    this.numSymbline[j] = 0;
-                    this.firstSymbline[j] = this.winLineArray[j][i];
-                }
-            }
-        } else if (j == 1) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                if (i > 0) {
-                    if (this.winLineArray[j][i] == this.winLineArray[j][i - 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
-                        this.numSymbline[j] ++;
-                    } else {
-                        break;
-                    }
-                } else if (i == 0 /*&& this.winLineArray[j][i] != this.freeSpinSymb*/) {
-                    this.numSymbline[j] = 0;
-                    this.firstSymbline[j] = this.winLineArray[j][i];
-                }
-            }
-        } else if (j == 2) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                if (i > 0) {
-                    if (this.winLineArray[j][i] == this.winLineArray[j][i - 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
-                        this.numSymbline[j] ++;
-                    } else {
-                        break;
-                    }
-                } else if (i == 0 /*&& this.winLineArray[j][i] != this.freeSpinSymb*/) {
-                    this.numSymbline[j] = 0;
-                    this.firstSymbline[j] = this.winLineArray[j][i];
-                }
-            }
-        } else if (j == 3) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                if (i > 0) {
-                    if (this.winLineArray[j][i] == this.winLineArray[j][i - 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
-                        this.numSymbline[j] ++;
-                    } else {
-                        break;
-                    }
-                } else if (i == 0 /* && this.winLineArray[j][i] != this.freeSpinSymb*/) {
-                    this.numSymbline[j] = 0;
-                    this.firstSymbline[j] = this.winLineArray[j][i];
-                }
-            }
-        } else if (j == 4) {
-            for (var i = 0; i < this.numCilinder; i++) {
-                if (i > 0) {
-                    if (this.winLineArray[j][i] == this.winLineArray[j][i - 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
-                        this.numSymbline[j] ++;
-                    } else {
-                        break;
-                    }
-                } else if (i == 0 /*&& this.winLineArray[j][i] != this.freeSpinSymb*/) {
-                    this.numSymbline[j] = 0;
-                    this.firstSymbline[j] = this.winLineArray[j][i];
-                }
+GenerateWinCombination.prototype.winLineRound = function() {
+    for (var j = 0; j < this.winLineArray.length; j++ ) {
+        this.firstSymbline[j] = this.winLineArray[j][0];
+        for (var i = 0; i < this.winLineArray[j].length-1; i++) {
+            if (this.winLineArray[j][i] == this.winLineArray[j][i + 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
+                this.numSymbline[j]++;
+            } else {
+                break;
             }
         }
     }
-   // console.log("this.firstSymbline", this.firstSymbline);
-   // console.log("this.numSymbline", this.numSymbline);
+    // console.log("this.firstSymbline", this.firstSymbline);
+    // console.log("this.numSymbline", this.numSymbline);
 };
 
 GenerateWinCombination.prototype.moveWinLine = function() {
-
-    for (var j = 0; j < this.moveArray.length; j++) {
-        for (var i = 0; i < this.moveArray[0].length; i++)
-        {
-            if (j == 0 && this.payTable[this.firstSymbline[j]][this.numSymbline[j]] > 0) {
-                this.moveArray[j][i] = [0, (i <= this.numSymbline[j] && this.numSymbline[j] > 0) ? 1 : 0, 0];
-                this.numWinSymbline[j] = 1;
-            } else if (j == 1 && this.payTable[this.firstSymbline[j]][this.numSymbline[j]]) {
-                this.moveArray[j][i] = [(i <= this.numSymbline[j] && this.numSymbline[j] > 0) ? 1 : 0, 0, 0];
-                this.numWinSymbline[j] = 1;
-            } else if (j == 2 && this.payTable[this.firstSymbline[j]][this.numSymbline[j]]) {
-                this.moveArray[j][i] = [0, 0, (i <= this.numSymbline[j] && this.numSymbline[j] > 0) ? 1 : 0];
-                this.numWinSymbline[j] = 1;
-            } else if (j == 3 && this.payTable[this.firstSymbline[j]][this.numSymbline[j]]) {
-                this.moveArray[j][i] = [
-                    (i == 0 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0,
-                    (i == 1 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0,
-                    (i == 2 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0
-                ];
-                this.numWinSymbline[j] = 1;
-            } else if (j == 4 && this.payTable[this.firstSymbline[j]][this.numSymbline[j]]) {
-                this.moveArray[j][i] = [
-                    (i == 2 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0,
-                    (i == 1 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0,
-                    (i == 0 && this.numSymbline[j] > 0 && i <= this.numSymbline[j]) ? 1 : 0
-                ];
-                this.numWinSymbline[j] = 1;
+    for (var j = 0; j < this.maskWinLine.length; j++ ) {
+        for (var i = 0; i < this.maskWinLine[j].length; i++ ) {
+            if (this.payTable[this.firstSymbline[j]][this.numSymbline[j]] > 0) {
+               this.moveArray[j][i][this.maskWinLine[j][i]] = (i <= this.numSymbline[j] && this.numSymbline[j] > 0) ? 1 : 0;
+               this.numWinSymbline[j] = 1;
             } else {
-                this.moveArray[j][i] = [ 0, 0, 0 ];
+                this.moveArray[j][i][this.maskWinLine[j][i]] = 0;
                 this.numWinSymbline[j] = 0;
             }
         }
     }
-   /* this.moveArray[1] = [
-        [1,0,0],
-        [1,0,0],
-        [1,0,0],
-        [1,0,0],
-        [1,0,0]
-    ];
-    this.moveArray[2] = [
-        [0,0,1],
-        [0,0,1],
-        [0,0,1],
-        [0,0,1],
-        [0,0,1]
-    ];
-    this.moveArray[3] = [
-            [1,0,0],
-            [0,1,0],
-            [0,0,1],
-            [0,1,0],
-            [1,0,0]
-        ];
-     this.moveArray[4] = [
-            [0,0,1],
-            [0,1,0],
-            [1,0,0],
-            [0,1,0],
-            [0,0,1]
-        ];*/
 
     console.log("Move Array", this.moveArray);
     console.log("Num Win Symb line", this.numWinSymbline);

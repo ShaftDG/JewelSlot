@@ -1,9 +1,9 @@
-function OneSymbolLabel(scene) {
+function OneSymbolLabel(scene, duration) {
     this.indexU = 0;
     this.indexV = 0;
     this.indexUBegin = 0;
     this.indexVBegin = 0;
-    this.duration = 60;
+    this.duration = duration;
     this.plane = BABYLON.MeshBuilder.CreatePlane("plane", {height:1.75, width: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     this.plane.rotation.y = Math.PI;
     this.pmat = new BABYLON.StandardMaterial("pmat", scene);

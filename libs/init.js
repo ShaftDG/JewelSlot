@@ -7,6 +7,7 @@ if (BABYLON.Engine.isSupported()) {
     var genCombination = new GenerateWinCombination(5,3,12);
     var endScaling = false;
     var dropInChest = false;
+    var allJewelsInChest = true;
     var mapLineWin = new Map();
     var autoPlay = false;
     var showRoundScore = true;
@@ -44,8 +45,9 @@ if (BABYLON.Engine.isSupported()) {
         var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
         texturesJewel.push(microSurfaceTexture.clone());
 
-        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene);
-        var roundScore = new TextLabel( new BABYLON.Vector3(-17, -15, 3), scene);
+        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene, 60);
+        var roundScore = new TextLabel( new BABYLON.Vector3(-17, -12, 3), scene, 60);
+        var bet = new TextLabel( new BABYLON.Vector3(-17, -15, 3), scene, 300);
 
         var plastic = new BABYLON.PBRMaterial("plastic", scene);
         plastic.reflectionTexture = hdrTexture;
@@ -124,7 +126,25 @@ if (BABYLON.Engine.isSupported()) {
         // defaultPipeline.grain.animated = true;
 ////////////////////////////////////////////////////
         var manager = new BABYLON.GUI.GUI3DManager(scene);
+        var countRow = 3;
+        var countColl = 5;
         function startRoundGame() {
+
+            for (var i = 0; i < countRow; i++) {
+                for (var j = 0; j < countColl; j++) {
+                    var obj = scene.getMeshByName(j + "-" + i);
+                    scene.stopAnimation(obj);
+                    obj.position.y = 20;
+                    obj.position.z = 0;
+                    obj.rotate(BABYLON.Axis.Z, (Math.random() < 0.5 ? -1 : 1) * Math.PI, BABYLON.Space.WORLD);
+                    obj.userData.rotateDestination = new BABYLON.Vector3(0, 0, (Math.random() < 0.5 ? -1 : 1) * 2 * Math.PI);
+                    obj.userData.flagDestination = false;
+                    obj.userData.flagStartTween = false;
+                    obj.userData.startDrop = true;
+                    obj.userData.inChest = false;
+                }
+            }
+
             mapLineWin.clear();
             genCombination.generate();
 
@@ -194,8 +214,6 @@ if (BABYLON.Engine.isSupported()) {
             }
         }
 ////////////////////////////////////////////////////
-        var countRow = 3;
-        var countColl = 5;
         var distanceBetweenSymbolRow = 6;
         var distanceBetweenSymbolColl = 6;
         var halfLengthRow = (distanceBetweenSymbolRow * (countColl-1)) / 2;
@@ -237,13 +255,44 @@ if (BABYLON.Engine.isSupported()) {
                 deltaPush: -0.05
             };
 
-            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[4], newMeshes[9], optionSecondButton, manager);
+            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[5], newMeshes[10], optionSecondButton, manager);
+            autoPlayButton.onPointerUpObservable.add(function () {
+                autoPlay = !autoPlay;
+                if (autoPlay) {
+                    autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(2.0,1.0,0.5);
+                    autoPlayButton.mesh.material.emissiveIntensity = 0.35;
+                } else {
+                    autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.0,0.0,0.0);
+                    autoPlayButton.mesh.material.emissiveIntensity = 0.0;
+                }
+            });
 
-            var plusBetButton = MakeButton("plusBetButton", newMeshes[3], newMeshes[9], optionSecondButton, manager);
-
-            var minusBetButton = MakeButton("minusBetButton", newMeshes[5], newMeshes[10], optionSecondButton, manager);
-
-            var maxBetButton = MakeButton("maxBetButton", newMeshes[2], newMeshes[10], optionSecondButton, manager);
+            var maxBetButton = MakeButton("maxBetButton", newMeshes[4], newMeshes[9], optionSecondButton, manager);
+            maxBetButton.onPointerUpObservable.add(function () {
+                genCombination.setMaxBet();
+                bet.setTextForAnimation(genCombination.bet.toString());
+                unEnableButton(plusBetButton);
+                enableButton(minusBetButton);
+            });
+            var plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[9], optionSecondButton, manager);
+            plusBetButton.onPointerUpObservable.add(function () {
+                genCombination.toIncreaseBet();
+                bet.setTextForAnimation(genCombination.bet.toString());
+                enableButton(minusBetButton);
+                if (genCombination.isMaxBet) {
+                    unEnableButton(plusBetButton);
+                }
+            });
+            var minusBetButton = MakeButton("minusBetButton", newMeshes[2], newMeshes[10], optionSecondButton, manager);
+            unEnableButton(minusBetButton);
+            minusBetButton.onPointerUpObservable.add(function () {
+                genCombination.reduceBet();
+                bet.setTextForAnimation(genCombination.bet.toString());
+                enableButton(plusBetButton);
+                if (genCombination.isMinBet) {
+                    unEnableButton(minusBetButton);
+                }
+            });
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
                 for (var i = 0; i < countRow; i++) {
@@ -338,6 +387,7 @@ if (BABYLON.Engine.isSupported()) {
                 engine.hideLoadingUI();
                 OpenChest.call(newMeshes[11], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
                 credit.setTextForAnimation(genCombination.totalScore.toString());
+                bet.setTextForAnimation(genCombination.bet.toString());
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -398,11 +448,19 @@ if (BABYLON.Engine.isSupported()) {
                     }
                 }
             }
-            if (autoPlay) {
+        });
+        scene.registerAfterRender(function () {
+            if (autoPlay && allJewelsInChest) {
+                allJewelsInChest = false;
+                endScaling = false;
+                genCombination.gettingWinnings();
+                roundScore.zeroing();
+                genCombination.placeBet();
+                credit.setTextForAnimation(genCombination.totalScore);
                 startRoundGame();
+                showRoundScore = true;
             }
         });
-
         return scene;
     };
 

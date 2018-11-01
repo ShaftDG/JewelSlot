@@ -1,9 +1,10 @@
-function TextLabel(position, scene) {
+function TextLabel(position, scene, duration) {
     this.arrayPlaneSymbols = [];
     this.scene = scene;
     this.position = position;
     this.distanceBetweenSymbol = 2;
     this.previousText = null;
+    this.duration = duration;
 }
 
 TextLabel.prototype.constructor = TextLabel;
@@ -11,7 +12,7 @@ TextLabel.prototype.constructor = TextLabel;
 TextLabel.prototype.addPlanesSymbols = function (countSymbols) {
     var posX = (((countSymbols-1) * this.distanceBetweenSymbol)/2) + this.position.x;
     for (var i = 0; i < countSymbols; i++) {
-        var symb = new OneSymbolLabel(this.scene);
+        var symb = new OneSymbolLabel(this.scene, this.duration);
         symb.plane.position.y = this.position.y;
         symb.plane.position.z = this.position.z;
         symb.plane.position.x = posX - i * this.distanceBetweenSymbol;
