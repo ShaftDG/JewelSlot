@@ -46,9 +46,10 @@ if (BABYLON.Engine.isSupported()) {
         var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
         texturesJewel.push(microSurfaceTexture.clone());
 
-        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene, 60);
-        var roundScore = new TextLabel( new BABYLON.Vector3(-17, -12, 3), scene, 60);
-        var bet = new TextLabel( new BABYLON.Vector3(-17, -15, 3), scene, 300);
+        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene, 60, {height:1.75, width: 2});
+        var roundScore = new TextLabel( new BABYLON.Vector3(0, 11, 3), scene, 60, {height:1.75, width: 2});
+        var bet = new TextLabel( new BABYLON.Vector3(-17, -14, 3), scene, 300, {height:1.75, width: 2});
+        var lines = new TextLabel( new BABYLON.Vector3(-17, -17, 3), scene, 300, {height:1.75, width: 2});
 
         var plastic = new BABYLON.PBRMaterial("plastic", scene);
         plastic.reflectionTexture = hdrTexture;
@@ -57,8 +58,8 @@ if (BABYLON.Engine.isSupported()) {
         plastic.microSurface = 0.8;
         plastic.reflectivityColor = new BABYLON.Color3(0.03, 0.03, 0.03);
 
-        var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 40), scene);
-        camera.setTarget(new BABYLON.Vector3(0, -3.5, 0));
+        var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
+        camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
         camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
@@ -159,7 +160,6 @@ if (BABYLON.Engine.isSupported()) {
                 endScaling = true;
             } else {
                 for (var i = 0; i < genCombination.numWinSymbline.length; i++) {
-                    if (genCombination.numWinSymbline[i] === 1) {
                         for (var j = 0; j < genCombination.moveArray[i].length; j++) {
                             for (var h = 0; h < genCombination.moveArray[i][j].length; h++) {
                                 var obj = scene.getMeshByName(j + "-" + h);
@@ -210,7 +210,6 @@ if (BABYLON.Engine.isSupported()) {
                                 }
                             }
                         }
-                    }
                 }
             }
         }
@@ -230,6 +229,29 @@ if (BABYLON.Engine.isSupported()) {
             z: -0.75
         };
         var winLines = WinLines(optionsWinLines, scene);
+
+        BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
+
+            newMeshes[1]._children.map(v => {
+                    var mat = v.material.clone();
+                    mat.reflectionTexture = hdrTexture;
+                    mat.emissiveColor = new BABYLON.Color3(-1, -1, -1);
+                    mat.emissiveIntensity = 0.0;
+                    v.material = mat;
+                 // console.log(v.name, v.material.emissiveTexture);
+            });
+
+            newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
+            newMeshes[0].name = "rightlines";
+            newMeshes[0].position.x = -20;
+            newMeshes[0].position.y = 7.68;
+            newMeshes[0].position.z = -0.75;
+
+            var leftLines = newMeshes[0].clone("leftLines");
+            leftLines.position.x = -newMeshes[0].position.x;
+            leftLines.position.y = newMeshes[0].position.y;
+            leftLines.position.z = newMeshes[0].position.z;
+        });
 
         BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
 
@@ -261,6 +283,7 @@ if (BABYLON.Engine.isSupported()) {
                 credit.setTextForAnimation(genCombination.totalScore);
                 startRoundGame();
                 showRoundScore = true;
+                winLines.map(v => {v.setEnabled(false)/*; v.renderingGroupId = 0;*/});
             });
 
             var optionSecondButton = {
@@ -271,8 +294,8 @@ if (BABYLON.Engine.isSupported()) {
             autoPlayButton.onPointerUpObservable.add(function () {
                 autoPlay = !autoPlay;
                 if (autoPlay) {
-                    autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(2.0,1.0,0.5);
-                    autoPlayButton.mesh.material.emissiveIntensity = 0.35;
+                    autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.5,0.25,0.125);
+                    autoPlayButton.mesh.material.emissiveIntensity = 0.05;
                 } else {
                     autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.0,0.0,0.0);
                     autoPlayButton.mesh.material.emissiveIntensity = 0.0;
@@ -282,14 +305,16 @@ if (BABYLON.Engine.isSupported()) {
             var maxBetButton = MakeButton("maxBetButton", newMeshes[4], newMeshes[9], optionSecondButton, manager);
             maxBetButton.onPointerUpObservable.add(function () {
                 genCombination.setMaxBet();
-                bet.setTextForAnimation(genCombination.bet.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 unEnableButton(plusBetButton);
                 enableButton(minusBetButton);
             });
             var plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[10], optionSecondButton, manager);
             plusBetButton.onPointerUpObservable.add(function () {
                 genCombination.toIncreaseBet();
-                bet.setTextForAnimation(genCombination.bet.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+               /* genCombination.toIncreaseLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());*/
                 enableButton(minusBetButton);
                 if (genCombination.isMaxBet) {
                     unEnableButton(plusBetButton);
@@ -299,7 +324,9 @@ if (BABYLON.Engine.isSupported()) {
             unEnableButton(minusBetButton);
             minusBetButton.onPointerUpObservable.add(function () {
                 genCombination.reduceBet();
-                bet.setTextForAnimation(genCombination.bet.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+              /*  genCombination.reduceLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());*/
                 enableButton(plusBetButton);
                 if (genCombination.isMinBet) {
                     unEnableButton(minusBetButton);
@@ -399,7 +426,8 @@ if (BABYLON.Engine.isSupported()) {
                 engine.hideLoadingUI();
                 OpenChest.call(newMeshes[11], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
                 credit.setTextForAnimation(genCombination.totalScore.toString());
-                bet.setTextForAnimation(genCombination.bet.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                lines.setTextForAnimation(genCombination.winLineNum.toString());
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -425,20 +453,30 @@ if (BABYLON.Engine.isSupported()) {
 ///////////////////////////////////
        // Lightning(scene);
 ///////////////////////////////////
+        function enableColorCheckLine(objCheckLine) {
+            objCheckLine.material.emissiveColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+            objCheckLine.material.emissiveIntensity = 2.0;
+        }
+        function unEnableColorCheckLine(objCheckLine) {
+            objCheckLine.material.emissiveColor = new BABYLON.Color3(-1, -1, -1);
+            objCheckLine.material.emissiveIntensity = 0.0;
+        }
+
         scene.registerBeforeRender(function () {
             if (mapLineWin.size && endScaling) {
                 var indexLine = mapLineWin.entries().next().value[0];
                 var objWineline =  winLines.filter((v, i) => i === indexLine)[0];
+                var objCheckLine = scene.getMeshByName("lines_" + (indexLine+1));
                 if (mapLineWin.has(indexLine)) {
                     var mapObjs = mapLineWin.get(indexLine);
                     if (mapObjs.moveForward) {
                         if (showRoundScore) {
                             showRoundScore = false;
                             var totalRound = genCombination.getTotalRound();
-                            console.log(totalRound);
                             roundScore.setTextForAnimation(totalRound.toString());
                         }
                         objWineline.setEnabled(true);
+                        enableColorCheckLine(objCheckLine);
                         mapObjs.array.map(v =>{
                             var animation = AnimationMoveForward.call(v, new BABYLON.Vector3(v.position.x, v.position.y, 5), 60);
                             animation.onAnimationEnd = function () {
@@ -450,22 +488,23 @@ if (BABYLON.Engine.isSupported()) {
                         mapObjs.moveForward = false;
                     } else if (mapObjs.moveBack) {
                         mapLineWin.delete(indexLine);
+                        unEnableColorCheckLine(objCheckLine);
+                        objWineline.setEnabled(false);
                         if (mapLineWin.size) {
-                            objWineline.setEnabled(false);
                             indexLine = mapLineWin.entries().next().value[0];
                         } else {
-                            winLines.map((v, i) => {
+                            /*winLines.map((v, i) => {
                                 genCombination.numWinSymbline[i] ? v.setEnabled(true) : v.setEnabled(false);
                                 v.renderingGroupId = 1;
-                            });
-                            setTimeout(() => {
+                            });*/
+                            // winLines.map(v => {v.setEnabled(false)/*; v.renderingGroupId = 0;*/});
+                            // setTimeout(() => {
                                 endScaling = false;
                                 dropInChest = true;
                                 roundScore.zeroing();
                                 genCombination.gettingWinnings();
                                 credit.setTextForAnimation(genCombination.totalScore);
-                                winLines.map(v => {v.setEnabled(false); v.renderingGroupId = 0;});
-                            }, 1000);
+                            // }, 750);
 
                         }
                     }
@@ -484,6 +523,13 @@ if (BABYLON.Engine.isSupported()) {
                 showRoundScore = true;
             }
         });
+        var gl = new BABYLON.GlowLayer("glow", scene, {
+            mainTextureRatio: 0.5,
+         //   mainTextureSamples: 1,
+         //   mainTextureFixedSize: 512,
+            blurKernelSize: 8
+        });
+        gl.intensity = 0.65;
         return scene;
     };
 

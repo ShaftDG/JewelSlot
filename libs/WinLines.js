@@ -13,10 +13,18 @@ function WinLines(options, scene) {
             new BABYLON.Vector3(points[points.length-1].x-options.deltaBeginEnd, points[points.length-1].y, points[0].z)
         ];
         var myMaterial = new BABYLON.PBRMaterial("myMaterial", scene);
-        myMaterial.emissiveColor = new BABYLON.Color3(0.75, 1.75, 2);
-        myMaterial.emissiveIntensity = 1.5;
-        myMaterial.alpha = 0.5;
-        var line = Line2D("line", {path: points, width:0.15, standardUV: false}, scene);
+      //  myMaterial.albedoTexture = new BABYLON.Texture("textures/chain.png", scene);
+       // myMaterial.environmentIntensity = 0.25;
+        myMaterial.metallic = 0.0;
+     //   myMaterial.albedoTexture.uScale = 1.2;
+    //    myMaterial.albedoTexture.vScale = 1.0;
+     //   myMaterial.albedoTexture.uOffset = 0.625;
+     //   myMaterial.albedoTexture.hasAlpha = true;
+        myMaterial.albedoColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+        myMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+        myMaterial.emissiveIntensity = 2.0;
+       // myMaterial.alpha = 0.5;
+        var line = Line2D("line", {path: points, width: 0.15, standardUV: false}, scene);
         line.material = myMaterial;
         // line.renderingGroupId = 1;
         arrayObjectLines = [...arrayObjectLines, line];

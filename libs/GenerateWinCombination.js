@@ -75,7 +75,9 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [0,1,2,1,0],
         [2,1,0,1,2],
         [0,0,1,0,0],
-        [2,2,1,2,2]
+        [2,2,1,2,2],
+        [1,0,1,0,1],
+        [1,2,1,2,1]
     ];
 
     this.winLineNum = this.maskWinLine.length;
@@ -118,13 +120,17 @@ function randomInteger(min, max) {
 }
 
 GenerateWinCombination.prototype.placeBet = function() {
-    this.totalScore -= this.bet;
+    this.totalScore -= this.bet * (this.winLineNum/3);
+};
+
+GenerateWinCombination.prototype.getTotalBet = function() {
+    return this.bet * (this.winLineNum/3);
 };
 
 GenerateWinCombination.prototype.gettingWinnings = function() {
     this.totalScore += this.getTotalRound();
     this.numSymbline = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
+    for (var j = 0; j < this.maskWinLine.length; j++ ) {
         this.numSymbline[j] = 0;
     }
 };
@@ -139,6 +145,14 @@ GenerateWinCombination.prototype.reduceBet = function() {
     this.bet = this.bet > this.maxBet * 0.5 ? this.bet -= 100 : this.bet > this.maxBet * 0.1 ? this.bet -= 50 : this.bet > this.minBet ? this.bet -= 10 : this.minBet;
     this.isMinBet = this.bet === this.minBet;
     this.isMaxBet = false;
+};
+
+GenerateWinCombination.prototype.toIncreaseLines = function() {
+    this.winLineNum = this.winLineNum < this.maskWinLine.length-3 ? this.winLineNum += 3 : this.maskWinLine.length;
+};
+
+GenerateWinCombination.prototype.reduceLines = function() {
+    this.winLineNum = this.winLineNum > 3 ? this.winLineNum -= 3 : 3;
 };
 
 GenerateWinCombination.prototype.setMaxBet = function() {
@@ -175,12 +189,12 @@ GenerateWinCombination.prototype.generate = function() {
         console.log("FreeSpin: No");
         this.numFreeSpinSymb = 0;
     }
-
     console.log("Stop Position Array", this.stopPositionArray);
     // console.log("this.arrayCombination", this.arrayCombination);
     this.winLine(this.arrayCombination);
     this.winLineRound();
     this.moveWinLine();
+    console.log("Round Score", this.getTotalRound());
     return this.arrayCombination;
 };
 
@@ -195,7 +209,7 @@ GenerateWinCombination.prototype.winLine = function(arrayCombination) {
 };
 
 GenerateWinCombination.prototype.winLineRound = function() {
-    for (var j = 0; j < this.winLineArray.length; j++ ) {
+    for (var j = 0; j < this.winLineNum; j++ ) {
         this.firstSymbline[j] = this.winLineArray[j][0];
         for (var i = 0; i < this.winLineArray[j].length-1; i++) {
             if (this.winLineArray[j][i] == this.winLineArray[j][i + 1] && this.winLineArray[j][i] == this.firstSymbline[j]) {
@@ -210,7 +224,7 @@ GenerateWinCombination.prototype.winLineRound = function() {
 };
 
 GenerateWinCombination.prototype.moveWinLine = function() {
-    for (var j = 0; j < this.maskWinLine.length; j++ ) {
+    for (var j = 0; j < this.winLineNum; j++ ) {
         for (var i = 0; i < this.maskWinLine[j].length; i++ ) {
             if (this.payTable[this.firstSymbline[j]][this.numSymbline[j]] > 0) {
                this.moveArray[j][i][this.maskWinLine[j][i]] = (i <= this.numSymbline[j] && this.numSymbline[j] > 0) ? 1 : 0;
@@ -231,7 +245,7 @@ GenerateWinCombination.prototype.getTotalRound = function() {
     for (var i = 0; i < this.numSymbline.length; i++) {
         totalRound += this.payTable[this.firstSymbline[i]][this.numSymbline[i]];
     }
-    return totalRound * (this.bet / 10.0);
+    return totalRound * ((this.bet * (this.winLineNum/3)) / 10.0);
 };
 
 

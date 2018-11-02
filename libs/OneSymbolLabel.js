@@ -1,10 +1,10 @@
-function OneSymbolLabel(scene, duration) {
+function OneSymbolLabel(scene, duration, parametres) {
     this.indexU = 0;
     this.indexV = 0;
     this.indexUBegin = 0;
     this.indexVBegin = 0;
     this.duration = duration;
-    this.plane = BABYLON.MeshBuilder.CreatePlane("plane", {height:1.75, width: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+    this.plane = BABYLON.MeshBuilder.CreatePlane("plane", {height:parametres.height, width: parametres.width, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     this.plane.rotation.y = Math.PI;
     this.pmat = new BABYLON.StandardMaterial("pmat", scene);
     this.pmat.diffuseTexture = new BABYLON.Texture("textures/numbers/numbers.png", scene);
