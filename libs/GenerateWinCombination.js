@@ -12,6 +12,10 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
     this.isMaxBet = false;
     this.isMinBet = true;
 
+    this.minLines = 3;
+    this.isMaxLines = false;
+    this.isMinLines = true;
+
     this.totalScore = 250250;
 
     this.stopPositionArray = [];
@@ -80,25 +84,26 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [1,2,1,2,1]
     ];
 
-    this.winLineNum = this.maskWinLine.length;
+    this.maxLines = this.maskWinLine.length;
+    this.winLineNum = this.minLines;
 
     this.numSymbline = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
+    for (var j = 0; j < this.maxLines; j++ ) {
         this.numSymbline[j] = 0;
     }
 
     this.numWinSymbline = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
+    for (var j = 0; j < this.maxLines; j++ ) {
         this.numWinSymbline[j] = 0;
     }
 
     this.firstSymbline = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
+    for (var j = 0; j < this.maxLines; j++ ) {
         this.firstSymbline[j] = 0;
     }
 
     this.winLineArray = [];
-    for (var j = 0; j < this.winLineNum; j++ ) {
+    for (var j = 0; j < this.maxLines; j++ ) {
         this.winLineArray[j]=[];
     }
 
@@ -148,11 +153,15 @@ GenerateWinCombination.prototype.reduceBet = function() {
 };
 
 GenerateWinCombination.prototype.toIncreaseLines = function() {
-    this.winLineNum = this.winLineNum < this.maskWinLine.length-3 ? this.winLineNum += 3 : this.maskWinLine.length;
+    this.winLineNum = this.winLineNum < this.maxLines-this.minLines ? this.winLineNum += this.minLines : this.maxLines;
+    this.isMaxLines = this.winLineNum === this.maxLines;
+    this.isMinLines = false;
 };
 
 GenerateWinCombination.prototype.reduceLines = function() {
-    this.winLineNum = this.winLineNum > 3 ? this.winLineNum -= 3 : 3;
+    this.winLineNum = this.winLineNum > this.minLines ? this.winLineNum -= this.minLines : this.minLines;
+    this.isMinLines = this.winLineNum === this.minLines;
+    this.isMaxLines = false;
 };
 
 GenerateWinCombination.prototype.setMaxBet = function() {

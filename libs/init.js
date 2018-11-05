@@ -49,7 +49,7 @@ if (BABYLON.Engine.isSupported()) {
         var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.35, width: 0.4});
         var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.36, width: 0.4});
         var bet = new TextLabel( new BABYLON.Vector3(0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
-        var lines = new TextLabel( new BABYLON.Vector3(-1.25, 0, 0), scene, 300, {height:0.35, width: 0.4});
+        var lines = new TextLabel( new BABYLON.Vector3(-1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
 
         var plastic = new BABYLON.PBRMaterial("plastic", scene);
         plastic.reflectionTexture = hdrTexture;
@@ -279,10 +279,47 @@ if (BABYLON.Engine.isSupported()) {
             lines.anchor.parent = rightBet;
             lines.anchor.scaling = new BABYLON.Vector3(-1, 1, 1);
 
-            var partition = BABYLON.MeshBuilder.CreateBox("", {height: 0.8, width: 0.1, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
-            partition.material = rightBet._children[0]._children[0].material;
-            partition.position.x = 0.6;
-            partition.parent = rightBet;
+            var materialLinesButton = new BABYLON.PBRMaterial("materialLinesButton", scene);
+            materialLinesButton.albedoTexture = new BABYLON.Texture("textures/arrow/DefaultMaterial_baseColor.png", scene);
+            materialLinesButton.albedoTexture.hasAlpha = true;
+            materialLinesButton.metallic = 0.0;
+
+            var plusMesh = BABYLON.MeshBuilder.CreateBox("", {height: 0.25, width: 0.25, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+            plusMesh.material = materialLinesButton.clone();
+            plusMesh.scaling = new BABYLON.Vector3(-1, 1, 1);
+            var optionPlusLineButton = {
+                deltaPush: new BABYLON.Vector3(0,0,0.05),
+                positionButton: new BABYLON.Vector3(1.6,0.02,0)
+            };
+            var plusLineButton = MakeButton("plusLineButton", plusMesh, rightBet, optionPlusLineButton, manager);
+            plusLineButton.onPointerUpObservable.add(function () {
+                genCombination.toIncreaseLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                enableButton(minusLineButton);
+                if (genCombination.isMaxLines) {
+                    unEnableButton(plusLineButton);
+                }
+            });
+
+            var minusMesh = BABYLON.MeshBuilder.CreateBox("", {height: 0.25, width: 0.25, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+            minusMesh.material = materialLinesButton.clone();
+            var optionMinusLineButton = {
+                deltaPush: new BABYLON.Vector3(0,0,0.05),
+                positionButton: new BABYLON.Vector3(0.8,0.02,0)
+            };
+            var minusLineButton = MakeButton("plusLineButton", minusMesh, rightBet, optionMinusLineButton, manager);
+            minusLineButton.onPointerUpObservable.add(function () {
+                genCombination.reduceLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                enableButton(plusLineButton);
+                if (genCombination.isMinLines) {
+                    unEnableButton(minusLineButton);
+                }
+            });
+            unEnableButton(minusLineButton);
+            enableButton(plusLineButton);
 
             var round = newMeshes[0].clone("round");
             round.scaling = new BABYLON.Vector3(7, 5, 5);
@@ -316,7 +353,7 @@ if (BABYLON.Engine.isSupported()) {
             shadowGenerator.addShadowCaster(newMeshes[11]);
 
             var optionStartButton = {
-                deltaPush: 0.1
+                deltaPush: new BABYLON.Vector3(0,0.1,0)
             };
 
            var startButton = MakeButton("startButton", newMeshes[1], newMeshes[8], optionStartButton, manager);
@@ -333,7 +370,7 @@ if (BABYLON.Engine.isSupported()) {
             });
 
             var optionSecondButton = {
-                deltaPush: -0.05
+                deltaPush: new BABYLON.Vector3(0,-0.05,0)
             };
 
             var autoPlayButton = MakeButton("autoPlayButton", newMeshes[5], newMeshes[10], optionSecondButton, manager);
