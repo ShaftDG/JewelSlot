@@ -39,17 +39,17 @@ if (BABYLON.Engine.isSupported()) {
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
         var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_2k.hdr", scene, 512, false, false) ;
-        var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000);
-        hdrTexture1.rotationY = skyBox.rotation.y = -0.1;
-
+        scene.environmentTexture = hdrTexture1;
+        var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
+        hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
         texturesJewel.push(hdrTexture.clone());
         var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
         texturesJewel.push(microSurfaceTexture.clone());
 
-        var credit = new TextLabel( new BABYLON.Vector3(17, -15, 3), scene, 60, {height:1.75, width: 2});
-        var roundScore = new TextLabel( new BABYLON.Vector3(0, 11, 3), scene, 60, {height:1.75, width: 2});
-        var bet = new TextLabel( new BABYLON.Vector3(-17, -14, 3), scene, 300, {height:1.75, width: 2});
-        var lines = new TextLabel( new BABYLON.Vector3(-17, -17, 3), scene, 300, {height:1.75, width: 2});
+        var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.35, width: 0.4});
+        var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.36, width: 0.4});
+        var bet = new TextLabel( new BABYLON.Vector3(0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
+        var lines = new TextLabel( new BABYLON.Vector3(-1.25, 0, 0), scene, 300, {height:0.35, width: 0.4});
 
         var plastic = new BABYLON.PBRMaterial("plastic", scene);
         plastic.reflectionTexture = hdrTexture;
@@ -72,22 +72,26 @@ if (BABYLON.Engine.isSupported()) {
         camera.upperBetaLimit = 1.5;
         engine.displayLoadingUI();
 
-        var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
-        light.position = new BABYLON.Vector3(20, 60, -20);
-        light.intensity = 2.0;
+        var light = new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(1, -3, -5), scene);
+        light.position = new BABYLON.Vector3(10, 30, 50);
+        light.setDirectionToTarget(new BABYLON.Vector3(0, 2, 0));
+        light.shadowMinZ = 1;
+        light.shadowMaxZ = 160;
+        light.intensity = 1.25;
+        light.shadowEnabled = true;
+
+        var lightSphere0 = BABYLON.Mesh.CreateSphere("Sphere0", 16, 0.5, scene);
+        lightSphere0.position = light.position;
+
+       // var HemisphericLight = new BABYLON.HemisphericLight("sun", new BABYLON.Vector3(-1, -2, -1), scene);
 
         var shadowGenerator = new BABYLON.ShadowGenerator(512, light);
-    /*    shadowGenerator.bias = 0.001;
-        shadowGenerator.normalBias = 0.02;
-        light.shadowMaxZ = 100;
-        light.shadowMinZ = 10;
-        shadowGenerator.useContactHardeningShadow = true;
-        shadowGenerator.contactHardeningLightSizeUVRatio = 0.05;
-        shadowGenerator.setDarkness(0.5);*/
-        shadowGenerator.useExponentialShadowMap = true;
-        shadowGenerator.useBlurExponentialShadowMap = true;
-        // shadowGenerator.useKernelBlur = true;
-        // shadowGenerator.blurKernel = 16;
+        shadowGenerator.bias = 0.01;
+        shadowGenerator.normalBias = 0.05;
+        shadowGenerator.useBlurCloseExponentialShadowMap = true;
+        shadowGenerator.useKernelBlur = true;
+        shadowGenerator.blurScale = 1.0;
+        shadowGenerator.blurKernel = 20.0;
 /////////////////////// postprocessing
         // Create default pipeline
         var defaultPipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [camera]);
@@ -253,6 +257,44 @@ if (BABYLON.Engine.isSupported()) {
             leftLines.position.z = newMeshes[0].position.z;
         });
 
+        BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.gltf", scene, function (newMeshes) {
+            newMeshes[0].name = "credit";
+            newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 4.5, 4.5);
+            newMeshes[0].position.x = 22;
+            newMeshes[0].position.y = -17.3;
+            newMeshes[0].position.z = -1.1;
+            newMeshes[0].rotation.y = -0.2;
+            newMeshes[0].rotation.z = -0.0872664626;
+            credit.anchor.parent = newMeshes[0];
+
+            var rightBet = newMeshes[0].clone("rightBet");
+            rightBet.scaling = new BABYLON.Vector3(4.5, 4.5, 4.5);
+            rightBet.position.x = -22;
+            rightBet.position.y = -17.5;
+            rightBet.position.z = -0.8;
+            rightBet.rotation.y = 0.2;
+            rightBet.rotation.z = 0.0872664626;
+            bet.anchor.parent = rightBet;
+            bet.anchor.scaling = new BABYLON.Vector3(-1, 1, 1);
+            lines.anchor.parent = rightBet;
+            lines.anchor.scaling = new BABYLON.Vector3(-1, 1, 1);
+
+            var partition = BABYLON.MeshBuilder.CreateBox("", {height: 0.8, width: 0.1, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+            partition.material = rightBet._children[0]._children[0].material;
+            partition.position.x = 0.6;
+            partition.parent = rightBet;
+
+            var round = newMeshes[0].clone("round");
+            round.scaling = new BABYLON.Vector3(7, 5, 5);
+            round.position.x = 0;
+            round.position.y = 15;
+            round.position.z = -20;
+            round.rotation.y = 0.2;
+            round.rotation.z = 0.0872664626*1.25;
+            roundScore.anchor.parent = round;
+            roundScore.anchor.scaling = new BABYLON.Vector3(-5/7, 1, 1);
+        });
+
         BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
 
             newMeshes[0].name = "chest";
@@ -262,12 +304,16 @@ if (BABYLON.Engine.isSupported()) {
 
             newMeshes[0]._children.map(v => {
                 v.material.reflectionTexture = hdrTexture;
-                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lock") !== -1 })[0]);
+               /* shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lock") !== -1 })[0]);
                 shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondLeft") !== -1 })[0]);
-                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondRight") !== -1 })[0]);
+                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondRight") !== -1 })[0]);*/
                 v.receiveShadows = true;
-               //   console.log(v.name);
+                shadowGenerator.addShadowCaster(v);
+                // console.log(v.name);
             });
+
+            newMeshes[11].receiveShadows = true;
+            shadowGenerator.addShadowCaster(newMeshes[11]);
 
             var optionStartButton = {
                 deltaPush: 0.1

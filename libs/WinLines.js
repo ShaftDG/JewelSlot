@@ -7,10 +7,17 @@ function WinLines(options, scene) {
             var y = options.distanceBetweenSymbolColl * (options.maskWinLine[j][i]+0.001) - options.halfLengthColl;
             points = [...points, new BABYLON.Vector3(-x, -y, options.z)];
         }
+        var deltaY = 1.5;
         points = [
-            new BABYLON.Vector3(points[0].x+options.deltaBeginEnd, points[0].y, points[0].z),
+            new BABYLON.Vector3(points[0].x+options.deltaBeginEnd,
+                j === 3 || j == 4 || j === 7 ? points[0].y-deltaY : j === 5 || j == 6 || j === 8 ? points[0].y+deltaY : points[0].y,
+                points[0].z),
+            new BABYLON.Vector3(points[0].x+options.deltaBeginEnd*0.75, points[0].y, points[0].z),
             ...points,
-            new BABYLON.Vector3(points[points.length-1].x-options.deltaBeginEnd, points[points.length-1].y, points[0].z)
+            new BABYLON.Vector3(points[points.length-1].x-options.deltaBeginEnd*0.75, points[points.length-1].y, points[points.length-1].z),
+            new BABYLON.Vector3(points[points.length-1].x-options.deltaBeginEnd,
+                j === 3 || j == 4 || j === 7 ? points[points.length-1].y-deltaY : j === 5 || j == 6 || j === 8 ? points[points.length-1].y+deltaY : points[points.length-1].y,
+                points[points.length-1].z)
         ];
         var myMaterial = new BABYLON.PBRMaterial("myMaterial", scene);
       //  myMaterial.albedoTexture = new BABYLON.Texture("textures/chain.png", scene);
@@ -20,8 +27,8 @@ function WinLines(options, scene) {
     //    myMaterial.albedoTexture.vScale = 1.0;
      //   myMaterial.albedoTexture.uOffset = 0.625;
      //   myMaterial.albedoTexture.hasAlpha = true;
-        myMaterial.albedoColor = new BABYLON.Color3(0.5, 0.75, 1.0);
-        myMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+        myMaterial.albedoColor = new BABYLON.Color3(1.0, 0.75, 0.25);
+        myMaterial.emissiveColor = new BABYLON.Color3(1.0, 0.75, 0.25);
         myMaterial.emissiveIntensity = 2.0;
        // myMaterial.alpha = 0.5;
         var line = Line2D("line", {path: points, width: 0.15, standardUV: false}, scene);

@@ -3,9 +3,10 @@ function TextLabel(position, scene, duration, parametres) {
     this.arrayPlaneSymbols = [];
     this.scene = scene;
     this.position = position;
-    this.distanceBetweenSymbol = 2;
+    this.distanceBetweenSymbol = this.parametres.width;
     this.previousText = null;
     this.duration = duration;
+    this.anchor = new BABYLON.TransformNode("");
 }
 
 TextLabel.prototype.constructor = TextLabel;
@@ -14,6 +15,7 @@ TextLabel.prototype.addPlanesSymbols = function (countSymbols) {
     var posX = (((countSymbols-1) * this.distanceBetweenSymbol)/2) + this.position.x;
     for (var i = 0; i < countSymbols; i++) {
         var symb = new OneSymbolLabel(this.scene, this.duration, this.parametres);
+        symb.plane.parent = this.anchor;
         symb.plane.position.y = this.position.y;
         symb.plane.position.z = this.position.z;
         symb.plane.position.x = posX - i * this.distanceBetweenSymbol;
