@@ -9,8 +9,8 @@ function AnimationMoveForward(targetForward, duration)
     var keysTorus = [];
     keysTorus.push({ frame: 0, value: object.position });
     keysTorus.push({ frame: 60, value: targetForward });
-  //  keysTorus.push({ frame: 60, value: targetForward });
-    keysTorus.push({ frame: 120, value: object.position });
+    keysTorus.push({ frame: 120, value: targetForward });
+    keysTorus.push({ frame: 180, value: object.position });
     animationForward.setKeys(keysTorus);
 
     // Adding an easing function
@@ -39,8 +39,26 @@ function AnimationMoveForward(targetForward, duration)
     object.animations = [];
     object.animations.push(animationForward);
 
-    //Finally, launch animations on object, from key 0 to key 120 with loop activated
+    var eventStartElectric = new BABYLON.AnimationEvent(0, function() {
+        object._children.map(v => {
+            if (v.visibility) {
+                v.particleSystem.start();
+            }
+        });
+    }, true);
+// Attach your event to your animation
+    animationForward.addEvent(eventStartElectric);
 
-    var anim = scene.beginAnimation(object, 0, 120, false, duration);
+    var eventStopElectric = new BABYLON.AnimationEvent(90, function() {
+        object._children.map(v => {
+            v.particleSystem.stop();
+        });
+    }, true);
+// Attach your event to your animation
+    animationForward.addEvent(eventStopElectric);
+
+    //Finally, launch animations on object, from key 0 to key 120 with loop activated
+    var anim = scene.beginAnimation(object, 0, 180, false, duration);
+
     return anim;
 };

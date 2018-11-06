@@ -60,7 +60,7 @@ if (BABYLON.Engine.isSupported()) {
 
         var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
-        camera.attachControl(canvas, false);
+        // camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
         camera.upperRadiusLimit = 50;
@@ -80,8 +80,8 @@ if (BABYLON.Engine.isSupported()) {
         light.intensity = 1.25;
         light.shadowEnabled = true;
 
-        var lightSphere0 = BABYLON.Mesh.CreateSphere("Sphere0", 16, 0.5, scene);
-        lightSphere0.position = light.position;
+       /* var lightSphere0 = BABYLON.Mesh.CreateSphere("Sphere0", 16, 0.5, scene);
+        lightSphere0.position = light.position;*/
 
        // var HemisphericLight = new BABYLON.HemisphericLight("sun", new BABYLON.Vector3(-1, -2, -1), scene);
 
@@ -115,10 +115,10 @@ if (BABYLON.Engine.isSupported()) {
         defaultPipeline.imageProcessing.exposure = 0.5;
         //
         defaultPipeline.bloomEnabled = true;
-        defaultPipeline.bloomKernel = 100;
-        defaultPipeline.bloomWeight = 0.2;
-        defaultPipeline.bloomThreshold = 0.1;
-        defaultPipeline.bloomScale = 0.1;
+        defaultPipeline.bloomKernel = 10;
+        defaultPipeline.bloomWeight = 0.02;
+        defaultPipeline.bloomThreshold = 0.01;
+        defaultPipeline.bloomScale = 0.01;
         //
         // defaultPipeline.depthOfFieldEnabled = true;
         // defaultPipeline.depthOfFieldDistance = 100;
@@ -234,6 +234,7 @@ if (BABYLON.Engine.isSupported()) {
         };
         var winLines = WinLines(optionsWinLines, scene);
 
+        Promise.all([
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
 
             newMeshes[1]._children.map(v => {
@@ -255,7 +256,7 @@ if (BABYLON.Engine.isSupported()) {
             leftLines.position.x = -newMeshes[0].position.x;
             leftLines.position.y = newMeshes[0].position.y;
             leftLines.position.z = newMeshes[0].position.z;
-        });
+        }),
 
         BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.gltf", scene, function (newMeshes) {
             newMeshes[0].name = "credit";
@@ -330,10 +331,9 @@ if (BABYLON.Engine.isSupported()) {
             round.rotation.z = 0.0872664626*1.25;
             roundScore.anchor.parent = round;
             roundScore.anchor.scaling = new BABYLON.Vector3(-5/7, 1, 1);
-        });
+        }),
 
         BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
-
             newMeshes[0].name = "chest";
             newMeshes[0].position.y = -10.648;
             newMeshes[0].position.z = -29;
@@ -351,7 +351,9 @@ if (BABYLON.Engine.isSupported()) {
 
             newMeshes[11].receiveShadows = true;
             shadowGenerator.addShadowCaster(newMeshes[11]);
-
+/////////////////////////////////////
+//             ElectricField(newMeshes[8]);
+/////////////////////////////////////
             var optionStartButton = {
                 deltaPush: new BABYLON.Vector3(0,0.1,0)
             };
@@ -415,8 +417,6 @@ if (BABYLON.Engine.isSupported()) {
                     unEnableButton(minusBetButton);
                 }
             });
-
-
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
@@ -532,7 +532,82 @@ if (BABYLON.Engine.isSupported()) {
 ///////////////////////////////////
 
 
-        });
+        })
+    ]).then(() => {
+            scene.registerBeforeRender(function () {
+                if (mapLineWin.size && endScaling) {
+                    var indexLine = mapLineWin.entries().next().value[0];
+                    var objWineline =  winLines.filter((v, i) => i === indexLine)[0];
+                    var objCheckLine = scene.getMeshByName("lines_" + (indexLine+1));
+                    if (mapLineWin.has(indexLine)) {
+                        var mapObjs = mapLineWin.get(indexLine);
+                        if (mapObjs.moveForward) {
+                            if (showRoundScore) {
+                                showRoundScore = false;
+                                var totalRound = genCombination.getTotalRound();
+                                roundScore.setTextForAnimation(totalRound.toString());
+                            }
+                            objWineline.setEnabled(true);
+                            enableColorCheckLine(objCheckLine);
+                            mapObjs.array.map(v =>{
+                                var animation = AnimationMoveForward.call(v, new BABYLON.Vector3(v.position.x, v.position.y, 5), 60);
+                              /*  v._children.map(v1 => {
+                                    if (v1.visibility) {
+                                        v1.particleSystem.start();
+                                    }
+                                });*/
+                                animation.onAnimationEnd = function () {
+                                    animation.animationStarted = false;
+                                    v.userData.startDrop = false;
+                                    mapObjs.moveBack = true;
+                                   /* v._children.map(v1 => {
+                                       v1.particleSystem.stop();
+                                    });*/
+                                }
+                            });
+                            mapObjs.moveForward = false;
+                        } else if (mapObjs.moveBack) {
+                            mapLineWin.delete(indexLine);
+                            unEnableColorCheckLine(objCheckLine);
+                            objWineline.setEnabled(false);
+                            if (mapLineWin.size) {
+                                indexLine = mapLineWin.entries().next().value[0];
+                            } else {
+                                endScaling = false;
+                                dropInChest = true;
+                                roundScore.zeroing();
+                                genCombination.gettingWinnings();
+                                credit.setTextForAnimation(genCombination.totalScore);
+                            }
+                        }
+                    }
+                } else  if (!mapLineWin.size && endScaling) {
+                    endScaling = false;
+                    setTimeout(() => {
+                        allJewelsInChest = true;
+                    }, 750);
+                }
+            });
+            scene.registerAfterRender(function () {
+                if (autoPlay && allJewelsInChest) {
+                    allJewelsInChest = false;
+                    endScaling = false;
+                    genCombination.gettingWinnings();
+                    roundScore.zeroing();
+                    genCombination.placeBet();
+                    credit.setTextForAnimation(genCombination.totalScore);
+                    startRoundGame();
+                    showRoundScore = true;
+                }
+            });
+            var gl = new BABYLON.GlowLayer("glow", scene, {
+                mainTextureRatio: 0.5,
+                //   mainTextureSamples: 1,
+                //   mainTextureFixedSize: 512,
+                blurKernelSize: 8
+            });
+            gl.intensity = 0.65;
+    });
 ///////////////////////////////////
        // Lightning(scene);
 ///////////////////////////////////
@@ -545,74 +620,6 @@ if (BABYLON.Engine.isSupported()) {
             objCheckLine.material.emissiveIntensity = 0.0;
         }
 
-        scene.registerBeforeRender(function () {
-            if (mapLineWin.size && endScaling) {
-                var indexLine = mapLineWin.entries().next().value[0];
-                var objWineline =  winLines.filter((v, i) => i === indexLine)[0];
-                var objCheckLine = scene.getMeshByName("lines_" + (indexLine+1));
-                if (mapLineWin.has(indexLine)) {
-                    var mapObjs = mapLineWin.get(indexLine);
-                    if (mapObjs.moveForward) {
-                        if (showRoundScore) {
-                            showRoundScore = false;
-                            var totalRound = genCombination.getTotalRound();
-                            roundScore.setTextForAnimation(totalRound.toString());
-                        }
-                        objWineline.setEnabled(true);
-                        enableColorCheckLine(objCheckLine);
-                        mapObjs.array.map(v =>{
-                            var animation = AnimationMoveForward.call(v, new BABYLON.Vector3(v.position.x, v.position.y, 5), 60);
-                            animation.onAnimationEnd = function () {
-                                animation.animationStarted = false;
-                                v.userData.startDrop = false;
-                                mapObjs.moveBack = true;
-                            }
-                        });
-                        mapObjs.moveForward = false;
-                    } else if (mapObjs.moveBack) {
-                        mapLineWin.delete(indexLine);
-                        unEnableColorCheckLine(objCheckLine);
-                        objWineline.setEnabled(false);
-                        if (mapLineWin.size) {
-                            indexLine = mapLineWin.entries().next().value[0];
-                        } else {
-                            /*winLines.map((v, i) => {
-                                genCombination.numWinSymbline[i] ? v.setEnabled(true) : v.setEnabled(false);
-                                v.renderingGroupId = 1;
-                            });*/
-                            // winLines.map(v => {v.setEnabled(false)/*; v.renderingGroupId = 0;*/});
-                            // setTimeout(() => {
-                                endScaling = false;
-                                dropInChest = true;
-                                roundScore.zeroing();
-                                genCombination.gettingWinnings();
-                                credit.setTextForAnimation(genCombination.totalScore);
-                            // }, 750);
-
-                        }
-                    }
-                }
-            }
-        });
-        scene.registerAfterRender(function () {
-            if (autoPlay && allJewelsInChest) {
-                allJewelsInChest = false;
-                endScaling = false;
-                genCombination.gettingWinnings();
-                roundScore.zeroing();
-                genCombination.placeBet();
-                credit.setTextForAnimation(genCombination.totalScore);
-                startRoundGame();
-                showRoundScore = true;
-            }
-        });
-        var gl = new BABYLON.GlowLayer("glow", scene, {
-            mainTextureRatio: 0.5,
-         //   mainTextureSamples: 1,
-         //   mainTextureFixedSize: 512,
-            blurKernelSize: 8
-        });
-        gl.intensity = 0.65;
         return scene;
     };
 

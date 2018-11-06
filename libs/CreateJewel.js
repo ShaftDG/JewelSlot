@@ -81,6 +81,7 @@ function CreateJewel(renderList, textures, position, isMobile)
     // meshes.map(v => { v.material = glassMaterial; v.position = position });
     this._children.map(v => {
         v.material = glassMaterial.clone();
+        v.particleSystem = ElectricField(v);
     });
     this.userData = {
         speedMove: null,

@@ -52,14 +52,12 @@ TextLabel.prototype.setText = function (text) {
 };
 
 TextLabel.prototype.setTextForAnimation = function (text) {
-
-
     if (this.previousText !== text) {
             var a = Math.abs(this.previousText - text).toString().length;
             var b = Math.floor(this.previousText * Math.pow(0.1, a));
             var c = Math.floor(text * Math.pow(0.1, a));
 
-            while (b > 1) {
+            while (b >= 1 || c >= 1) {
                 if (Math.abs(b - c) > 0) {
                     a++;
                 }

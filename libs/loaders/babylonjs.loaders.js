@@ -1784,7 +1784,7 @@ var BABYLON;
         // V1 options
         // ----------
         /**
-         * Set this property to false to disable incremental loading which delays the loader from calling the success callback until after loading the meshes and shaders.
+         * Set this property to false to disable incremental loading which delays the loader from calling the success callback until after loading the meshes and Shaders.
          * Textures always loads asynchronously. For example, the success callback can compute the bounding information of the loaded meshes when incremental loading is disabled.
          * Defaults to true.
          * @hidden
@@ -1937,7 +1937,7 @@ var BABYLON;
     var GLTF1;
     (function (GLTF1) {
         /**
-        * Tokenizer. Used for shaders compatibility
+        * Tokenizer. Used for Shaders compatibility
         * Automatically map world, view, projection, worldViewProjection, attributes and so on
         */
         var ETokenType;
@@ -2745,7 +2745,7 @@ var BABYLON;
             }
         };
         /**
-        * do stuff after buffers, shaders are loaded (e.g. hook up materials, load animations, etc.)
+        * do stuff after buffers, Shaders are loaded (e.g. hook up materials, load animations, etc.)
         */
         var postLoad = function (gltfRuntime) {
             // Nodes
@@ -2895,7 +2895,7 @@ var BABYLON;
             return tokenizer.currentIdentifier;
         };
         /**
-        * All shaders loaded. Create materials one by one
+        * All Shaders loaded. Create materials one by one
         */
         var importMaterials = function (gltfRuntime) {
             // Create materials
@@ -3271,7 +3271,7 @@ var BABYLON;
                             skeletons.push(skin.babylonSkeleton);
                         }
                     }
-                    // Load buffers, shaders, materials, etc.
+                    // Load buffers, Shaders, materials, etc.
                     _this._loadBuffersAsync(gltfRuntime, function () {
                         _this._loadShadersAsync(gltfRuntime, function () {
                             importMaterials(gltfRuntime);
@@ -3319,7 +3319,7 @@ var BABYLON;
                     GLTF1.GLTFLoaderExtension.LoadRuntimeExtensionsAsync(gltfRuntime, function () {
                         // Create nodes
                         _this._createNodes(gltfRuntime);
-                        // Load buffers, shaders, materials, etc.
+                        // Load buffers, Shaders, materials, etc.
                         _this._loadBuffersAsync(gltfRuntime, function () {
                             _this._loadShadersAsync(gltfRuntime, function () {
                                 importMaterials(gltfRuntime);
