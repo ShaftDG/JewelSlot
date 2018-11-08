@@ -1,7 +1,6 @@
 if (BABYLON.Engine.isSupported()) {
     var canvas = document.querySelector("#renderCanvas");
     var engine = new BABYLON.Engine(canvas, false, {}, false);
-   // engine._fps = 120;
     engine.disableManifestCheck = true;
 
     var genCombination = new GenerateWinCombination(5,3,12);
@@ -14,6 +13,10 @@ if (BABYLON.Engine.isSupported()) {
     var showRoundScore = true;
 
     var createScene = function () {
+
+        // detect available formats
+        // var available = ['-astc.ktx', '-dxt.ktx', '-pvrtc.ktx', '-etc1.ktx', '-etc2.ktx'];
+        // var formatUsed = engine.setTextureFormatToUse(available);
 
         var loadingScreen = new CustomLoadingScreen("textures/babylonjs.mp4");
         engine.loadingScreen = loadingScreen;
@@ -39,7 +42,7 @@ if (BABYLON.Engine.isSupported()) {
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
         var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_2k.hdr", scene, 512, false, false) ;
-        scene.environmentTexture = hdrTexture1;
+        scene.environmentTexture = hdrTexture;
         var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
         hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
         texturesJewel.push(hdrTexture.clone());
@@ -51,14 +54,8 @@ if (BABYLON.Engine.isSupported()) {
         var bet = new TextLabel( new BABYLON.Vector3(0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
         var lines = new TextLabel( new BABYLON.Vector3(-1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
 
-        var plastic = new BABYLON.PBRMaterial("plastic", scene);
-        plastic.reflectionTexture = hdrTexture;
-        plastic.microSurface = 1.2;
-        plastic.albedoColor = new BABYLON.Color3(0.9, 1.0, 0.9);
-        plastic.microSurface = 0.8;
-        plastic.reflectivityColor = new BABYLON.Color3(0.03, 0.03, 0.03);
-
         var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
+        scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
         // camera.attachControl(canvas, false);
 
@@ -95,30 +92,30 @@ if (BABYLON.Engine.isSupported()) {
 /////////////////////// postprocessing
         // Create default pipeline
         var defaultPipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [camera]);
-        defaultPipeline.brightThreshold = 0.8;
-        var curve = new BABYLON.ColorCurves();
-        curve.globalHue = 200;
-        curve.globalDensity = 80;
-        curve.globalSaturation = 80;
-        curve.highlightsHue = 100;
-        curve.highlightsDensity = 80;
-        curve.highlightsSaturation = -80;
-        curve.shadowsHue = 2;
-        curve.shadowsDensity = 80;
-        curve.shadowsSaturation = 40;
-        defaultPipeline.imageProcessing.colorCurves = curve;
-        defaultPipeline.depthOfField.focalLength = 150;
-        //
-        defaultPipeline.samples = 4;
+        // defaultPipeline.brightThreshold = 0.8;
+        // var curve = new BABYLON.ColorCurves();
+        // curve.globalHue = 200;
+        // curve.globalDensity = 80;
+        // curve.globalSaturation = 80;
+        // curve.highlightsHue = 100;
+        // curve.highlightsDensity = 80;
+        // curve.highlightsSaturation = -80;
+        // curve.shadowsHue = 2;
+        // curve.shadowsDensity = 80;
+        // curve.shadowsSaturation = 40;
+        // defaultPipeline.imageProcessing.colorCurves = curve;
+        // defaultPipeline.depthOfField.focalLength = 150;
+
+        defaultPipeline.samples = 2;
         defaultPipeline.fxaaEnabled = true;
-        defaultPipeline.imageProcessing.contrast = 0.8;
-        defaultPipeline.imageProcessing.exposure = 0.5;
-        //
-        defaultPipeline.bloomEnabled = true;
-        defaultPipeline.bloomKernel = 10;
-        defaultPipeline.bloomWeight = 0.02;
-        defaultPipeline.bloomThreshold = 0.01;
-        defaultPipeline.bloomScale = 0.01;
+        // defaultPipeline.imageProcessing.contrast = 0.8;
+        // defaultPipeline.imageProcessing.exposure = 0.5;
+
+        // defaultPipeline.bloomEnabled = true;
+        // defaultPipeline.bloomKernel = 10;
+        // defaultPipeline.bloomWeight = 0.02;
+        // defaultPipeline.bloomThreshold = 0.01;
+        // defaultPipeline.bloomScale = 0.01;
         //
         // defaultPipeline.depthOfFieldEnabled = true;
         // defaultPipeline.depthOfFieldDistance = 100;
@@ -285,7 +282,7 @@ if (BABYLON.Engine.isSupported()) {
             materialLinesButton.albedoTexture.hasAlpha = true;
             materialLinesButton.metallic = 0.0;
 
-            var plusMesh = BABYLON.MeshBuilder.CreateBox("", {height: 0.25, width: 0.25, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+            var plusMesh = BABYLON.MeshBuilder.CreateBox("", {height: 0.3, width: 0.3, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
             plusMesh.material = materialLinesButton.clone();
             plusMesh.scaling = new BABYLON.Vector3(-1, 1, 1);
             var optionPlusLineButton = {
@@ -303,8 +300,9 @@ if (BABYLON.Engine.isSupported()) {
                 }
             });
 
-            var minusMesh = BABYLON.MeshBuilder.CreateBox("", {height: 0.25, width: 0.25, depth: 0.1, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+            var minusMesh = plusMesh.clone();
             minusMesh.material = materialLinesButton.clone();
+            minusMesh.scaling = new BABYLON.Vector3(-1, 1, 1);
             var optionMinusLineButton = {
                 deltaPush: new BABYLON.Vector3(0,0,0.05),
                 positionButton: new BABYLON.Vector3(0.8,0.02,0)
@@ -319,8 +317,8 @@ if (BABYLON.Engine.isSupported()) {
                     unEnableButton(minusLineButton);
                 }
             });
-            unEnableButton(minusLineButton);
-            enableButton(plusLineButton);
+            unEnableButton(plusLineButton);
+            enableButton(minusLineButton);
 
             var round = newMeshes[0].clone("round");
             round.scaling = new BABYLON.Vector3(7, 5, 5);
@@ -341,9 +339,6 @@ if (BABYLON.Engine.isSupported()) {
 
             newMeshes[0]._children.map(v => {
                 v.material.reflectionTexture = hdrTexture;
-               /* shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lock") !== -1 })[0]);
-                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondLeft") !== -1 })[0]);
-                shadowGenerator.addShadowCaster(v.getChildMeshes(false, (node) => { return node.name.indexOf("lockSecondRight") !== -1 })[0]);*/
                 v.receiveShadows = true;
                 shadowGenerator.addShadowCaster(v);
                 // console.log(v.name);
@@ -435,9 +430,9 @@ if (BABYLON.Engine.isSupported()) {
             var options = new BABYLON.SceneOptimizerOptions(30, 500);
             options.addOptimization(new BABYLON.HardwareScalingOptimization(0, 1));
             options.addCustomOptimization(function () {
-                defaultPipeline.bloomEnabled = false;
+                // defaultPipeline.bloomEnabled = false;
                 defaultPipeline.fxaaEnabled = false;
-                defaultPipeline.sharpenEnabled = false;
+                // defaultPipeline.sharpenEnabled = false;
                 scene.shadowsEnabled = false;
                 return true;
             }, function () {

@@ -85,7 +85,7 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
     ];
 
     this.maxLines = this.maskWinLine.length;
-    this.winLineNum = this.minLines;
+    this.winLineNum = this.maxLines;
 
     this.numSymbline = [];
     for (var j = 0; j < this.maxLines; j++ ) {
