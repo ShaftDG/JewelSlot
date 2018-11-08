@@ -69,11 +69,11 @@ function ElectricField(emitter) {
 
     // Size of each particle (random between...
     particleSystem.minSize = 0.5;
-    particleSystem.maxSize = 4.0;
+    particleSystem.maxSize = 3.0;
 
     // Life time of each particle (random between...
     particleSystem.minLifeTime = 0.1;
-    particleSystem.maxLifeTime = 0.75;
+    particleSystem.maxLifeTime = 0.65;
 
     // Color gradient over life
     // particleSystem.addColorGradient(0, new BABYLON.Color4(1, 1, 1, 0));
@@ -102,8 +102,8 @@ function ElectricField(emitter) {
     particleSystem.maxEmitPower = 1.0;
     particleSystem.updateSpeed = 1/60;
 
-    particleSystem.addVelocityGradient(0, 3, 5);
-    particleSystem.addVelocityGradient(1.0, -5, -10);
+    // particleSystem.addVelocityGradient(0, 3, 5);
+    // particleSystem.addVelocityGradient(1.0, -5, -10);
 
     // No billboard
     particleSystem.isBillboardBased = false;
