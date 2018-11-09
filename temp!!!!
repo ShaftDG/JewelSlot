@@ -1,8 +1,0 @@
- "occlusionFactor" : [
-                0.01,
-                0.01,
-                0.01
-            ],
-            "occlusionTexture" : {
-                "index" : 1
-            },

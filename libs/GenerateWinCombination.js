@@ -24,7 +24,7 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [  0 ,  25 ,  100 , 1000 , 5000 ], // SYMB_Square
         [  0 ,  25 ,   50 ,  200 ,  500 ], // SYMB_Diamond
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Pad
-        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Bar
+        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_PartMap
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Bell
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Coins
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Horseshoe
@@ -35,9 +35,10 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Strawberry
     ];
 
-    this.freeSpinSymb = 7;
+    this.freeSpinSymb = 3;
     this.numFreeSpinSymb = 0;
     this.numFreeSpin = 0;
+    this.isFreeSpin = false;
     this.boolFreeSpin = false;
     this.numFreeSpinToRound = 2;
 
@@ -56,11 +57,11 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ]
     ];*/
     this.r = [
-        [ 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0 ],
-        [ 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1 ],
-        [ 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2 ],
-        [ 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0 ],
-        [ 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1 ]
+        [ 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0 ],
+        [ 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1 ],
+        [ 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2 ],
+        [ 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0 ],
+        [ 1, 0, 1, 0, 2, 0, 2, 3, 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1 ]
     ];
 
     this.arrayCombination = [];
@@ -125,7 +126,11 @@ function randomInteger(min, max) {
 }
 
 GenerateWinCombination.prototype.placeBet = function() {
-    this.totalScore -= this.bet * (this.winLineNum/3);
+    if (this.numFreeSpin <= 0) {
+        this.totalScore -= this.bet * (this.winLineNum / 3);
+    } else {
+        this.numFreeSpin--;
+    }
 };
 
 GenerateWinCombination.prototype.getTotalBet = function() {
@@ -173,6 +178,7 @@ GenerateWinCombination.prototype.setMaxBet = function() {
 GenerateWinCombination.prototype.generate = function() {
     this.numFreeSpinSymb = 0;
     this.boolPlusFreeSpin = false;
+    this.isFreeSpin = false;
     for (var j = 0; j < this.numCilinder; j++ ) {
         var stopPosition = randomInteger(0, this.r[0].length - 1);
         this.stopPositionArray[j] = stopPosition;
@@ -188,11 +194,12 @@ GenerateWinCombination.prototype.generate = function() {
         }
     }
     console.log("=================================");
-    if (this.numFreeSpinSymb >= 3) {
+    if (this.numFreeSpinSymb >= 2) {
         this.numFreeSpin += this.numFreeSpinToRound;
         console.log("FreeSpin: Yes - ", this.numFreeSpin);
         console.log("Move Array Free Spin Symb", this.moveArrayFreeSpinSymb);
         this.numFreeSpinSymb = 0;
+        this.isFreeSpin = true;
     }
     if (this.numFreeSpin <= 0) {
         console.log("FreeSpin: No");

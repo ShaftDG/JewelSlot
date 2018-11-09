@@ -75,10 +75,10 @@ function AnimationMoveForward(targetForward, duration)
 // Attach your event to your animation
     animationForward.addEvent(eventStartElectric);
 
-    var eventStopElectric = new BABYLON.AnimationEvent(70, function() {
+    var eventStopElectric = new BABYLON.AnimationEvent(120, function() {
         object._children.map(v => {
-            // v.particleSystem.electric.reset();
-            // v.particleSystem.fire.reset();
+            v.particleSystem.electric.reset();
+            v.particleSystem.fire.reset();
             v.particleSystem.electric.stop();
             v.particleSystem.fire.stop();
         });

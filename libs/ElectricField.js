@@ -1,28 +1,28 @@
-function ElectricField(emitter, type) {
- /*   var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, "electric",
-        {
-            needAlphaBlending: true,
-            attributes: ["position", "normal", "uv"],
-            uniforms: ["worldViewProjection", "time"]
-        });
-    shaderMaterial.backFaceCulling = false;
-    shaderMaterial.alpha = 0.9999;
-    shaderMaterial.alphamode = BABYLON.Engine.ALPHA_MULTIPLY;
-     var box = BABYLON.Mesh.CreateBox("Sphere0", 0.1, scene);
-      box.material = shaderMaterial;
+function ElectricField(emitter) {
+    /*   var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, "electric",
+           {
+               needAlphaBlending: true,
+               attributes: ["position", "normal", "uv"],
+               uniforms: ["worldViewProjection", "time"]
+           });
+       shaderMaterial.backFaceCulling = false;
+       shaderMaterial.alpha = 0.9999;
+       shaderMaterial.alphamode = BABYLON.Engine.ALPHA_MULTIPLY;
+        var box = BABYLON.Mesh.CreateBox("Sphere0", 0.1, scene);
+         box.material = shaderMaterial;
 
-    var time = Math.random() * 50;
-    var order = 0.025;
+       var time = Math.random() * 50;
+       var order = 0.025;
 
-    shaderMaterial.onBind = function () {
-        shaderMaterial.setFloat("time", time);
+       shaderMaterial.onBind = function () {
+           shaderMaterial.setFloat("time", time);
 
-        time += order;
+           time += order;
 
-        if (time > 100 || time < 0) {
-            order *= -1;
-        }
-    };*/
+           if (time > 100 || time < 0) {
+               order *= -1;
+           }
+       };*/
 
 // Effect
     var effect = engine.createEffectForParticles("electric", ["time"]);
@@ -129,13 +129,16 @@ function ElectricField(emitter, type) {
     // particleSystemFire.addSizeGradient(0.4, 0.5, 0.3);
     //  particleSystemFire.addSizeGradient(5.0, 3.0, 4.0);
     // Where the particles come from
-    particleSystemFire.emitter = emitter; // the starting object, the emitter
+    var fireEmitter = new BABYLON.TransformNode("");
+    fireEmitter.parent = emitter;
+    fireEmitter.position.y -= 0.5;
+    fireEmitter.position.z -= 1.0;
+    particleSystemFire.emitter = fireEmitter; // the starting object, the emitter
     var emitterType = new BABYLON.SphereParticleEmitter();
-    emitterType.radius = 2.0;
-    emitterType.radiusRange = 0;
+    emitterType.radius = 3.0;
     particleSystemFire.particleEmitterType = emitterType;
 
-    particleSystemFire.createCylinderEmitter(2.35,4.5,0,0);
+    particleSystemFire.createCylinderEmitter(2.1,4.0,0,0);
 
     particleSystemFire.startSpriteCellID = 0;
     particleSystemFire.endSpriteCellID = 31;
@@ -154,10 +157,10 @@ function ElectricField(emitter, type) {
     particleSystemFire.translationPivot = new BABYLON.Vector2(0, -0.5);
 
     // Colors of all particles
-    // particleSystemFire.addColorGradient(1.0, new BABYLON.Color4.FromHexString("#fdcf58ff"));
-    // particleSystemFire.addColorGradient(0.75, new BABYLON.Color4.FromHexString("#f27d0cff"));
-    // particleSystemFire.addColorGradient(0.5, new BABYLON.Color4.FromHexString("#f07f13ff"));
-    // particleSystemFire.addColorGradient(0.25, new BABYLON.Color4.FromHexString("#757676ff"));
+    particleSystemFire.addColorGradient(1.0, new BABYLON.Color4.FromHexString("#fdcf58ff"));
+    particleSystemFire.addColorGradient(0.75, new BABYLON.Color4.FromHexString("#f27d0cff"));
+    particleSystemFire.addColorGradient(0.5, new BABYLON.Color4.FromHexString("#f07f13ff"));
+    particleSystemFire.addColorGradient(0.25, new BABYLON.Color4.FromHexString("#757676ff"));
     //
     particleSystemFire.color1 = new BABYLON.Color4.FromHexString("#fdcf58ff");
     particleSystemFire.color2 = new BABYLON.Color4.FromHexString("#f27d0cff");
@@ -177,13 +180,13 @@ function ElectricField(emitter, type) {
     particleSystemFire.useRampGradients = true;
 
     // Defines the color remapper over time
-    particleSystemFire.addColorRemapGradient(0, 0, 0.1);
-    particleSystemFire.addColorRemapGradient(0.2, 0.1, 0.8);
-    particleSystemFire.addColorRemapGradient(0.3, 0.2, 0.85);
-    particleSystemFire.addColorRemapGradient(0.35, 0.2, 0.85);
-    particleSystemFire.addColorRemapGradient(0.4, 0.3, 0.9);
-    particleSystemFire.addColorRemapGradient(0.75, 0.65, 1.0);
-    particleSystemFire.addColorRemapGradient(1.0, 0.95, 1.0);
+    // particleSystemFire.addColorRemapGradient(0, 0, 0.1);
+    // particleSystemFire.addColorRemapGradient(0.2, 0.1, 0.8);
+    // particleSystemFire.addColorRemapGradient(0.3, 0.2, 0.85);
+    // particleSystemFire.addColorRemapGradient(0.35, 0.2, 0.85);
+    // particleSystemFire.addColorRemapGradient(0.4, 0.3, 0.9);
+    // particleSystemFire.addColorRemapGradient(0.75, 0.65, 1.0);
+    // particleSystemFire.addColorRemapGradient(1.0, 0.95, 1.0);
 
     // Emission rate
     particleSystemFire.emitRate = 50;

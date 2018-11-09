@@ -79,6 +79,8 @@ function CreateJewel(renderList, textures, position, isMobile)
 
     // glassMaterial.refractionTexture = refractionTexture;
     // meshes.map(v => { v.material = glassMaterial; v.position = position });
+    var partMap = BABYLON.MeshBuilder.CreateBox("partMap", {height: 2, width: 2, depth: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+    partMap.parent = this;
     this._children.map(v => {
         v.material = glassMaterial.clone();
         v.particleSystem = ElectricField(v);
@@ -89,6 +91,8 @@ function CreateJewel(renderList, textures, position, isMobile)
         // flagDestination: false,
         flagStartTween: false,
         inChest: false,
+        inFreeSpin: false,
+        endInChestAnimation: false,
         startDrop: false,
         scalingDown: false,
         visibleSymbol: null
