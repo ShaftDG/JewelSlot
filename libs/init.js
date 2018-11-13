@@ -1,6 +1,6 @@
 if (BABYLON.Engine.isSupported()) {
     var canvas = document.querySelector("#renderCanvas");
-    var engine = new BABYLON.Engine(canvas, false, {}, false);
+    var engine = new BABYLON.Engine(canvas, true, { stencil: true }, false);
     engine.disableManifestCheck = true;
 
     var genCombination = new GenerateWinCombination(5,3,12);
@@ -9,9 +9,11 @@ if (BABYLON.Engine.isSupported()) {
     var endDrop = false;
     var dropInChest = false;
     var moveFreeSpin = false;
+    var numberPartMap = 0;
     var mapLineWin = new Map();
     var mapAllSymbol = new Map();
     var countSymbolWin = 0;
+    var countSymbolScaling = 0;
     var arrayObjectsFreeSpin = [];
     var autoPlay = false;
     var showRoundScore = true;
@@ -49,9 +51,9 @@ if (BABYLON.Engine.isSupported()) {
         scene.environmentTexture = hdrTexture;
         var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
         hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
-        texturesJewel.push(hdrTexture.clone());
-        var microSurfaceTexture = new BABYLON.Texture("textures/noise.png", scene);
-        texturesJewel.push(microSurfaceTexture.clone());
+        texturesJewel = [...texturesJewel, hdrTexture];
+    /*    var emissiveTextureMap = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
+        texturesJewel = [...texturesJewel, emissiveTextureMap];*/
 
         var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.35, width: 0.4});
         var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.36, width: 0.4});
@@ -143,6 +145,7 @@ if (BABYLON.Engine.isSupported()) {
             arrayObjectsFreeSpin = [];
             genCombination.generate();
             countSymbolWin = 0;
+            countSymbolScaling = 0;
             for (var i = 0; i < countRow; i++) {
                 for (var j = 0; j < countColl; j++) {
                     var obj = scene.getMeshByName(j + "-" + i);
@@ -152,9 +155,22 @@ if (BABYLON.Engine.isSupported()) {
                         v.particleSystem.fire.reset();
                         v.particleSystem.electric.stop();
                         v.particleSystem.fire.stop();
+                        v.scaling = new BABYLON.Vector3(1,1,1);
+                        v.rotation = BABYLON.Vector3.Zero();
+                        if (v.name === obj.name + "." + "map_1") {
+                            v.position.x = 1.5;
+                            v.position.y = -0.75;
+                        } else if (v.name === obj.name + "." + "map_2") {
+                            v.position.x = -1.5;
+                            v.position.y = -0.5;
+                        } else if (v.name === obj.name + "." + "map_3") {
+                            v.position.y = 1.9;
+                        }
                     });
                     obj.position.y = 20;
                     obj.position.z = 0;
+                    obj.scaling = new BABYLON.Vector3(-1, 1, 1);
+                    obj.rotation = BABYLON.Vector3.Zero();
                     obj.rotate(BABYLON.Axis.Z, (Math.random() < 0.5 ? -1 : 1) * Math.PI, BABYLON.Space.WORLD);
                     obj.userData.rotateDestination = new BABYLON.Vector3(0, 0, (Math.random() < 0.5 ? -1 : 1) * 2 * Math.PI);
                     obj.userData.flagDestination = false;
@@ -162,6 +178,7 @@ if (BABYLON.Engine.isSupported()) {
                     obj.userData.startDrop = true;
                     obj.userData.inChest = false;
                     obj.userData.endInChestAnimation = false;
+                    obj.userData.endScalingAnimation = false;
                     obj.userData.inFreeSpin = false;
                     if (genCombination.isFreeSpin && genCombination.moveArrayFreeSpinSymb[j][i] === 1) {
                         arrayObjectsFreeSpin = [...arrayObjectsFreeSpin, obj];
@@ -208,25 +225,20 @@ if (BABYLON.Engine.isSupported()) {
                                     } else {
                                         if (arrayObjectsFreeSpin.indexOf(obj) === -1) {
                                             obj.userData.scalingDown = true;
+                                            countSymbolScaling++;
                                         }
-                                    }
-                                    var indexColorChanel = arr[j][h] + 1;
-                                    var colorJewel = new BABYLON.Color3(0, 0, 0);
-                                    if (indexColorChanel === 1) {
-                                        colorJewel.r = 2.0;
-                                    } else if (indexColorChanel === 2) {
-                                        colorJewel.g = 2.0;
-                                    } else if (indexColorChanel === 3) {
-                                        colorJewel.b = 2.0;
                                     }
 
                                     obj.userData.visibleSymbol = arr[j][h];
-                                    obj._children[arr[j][h]].material.albedoColor = colorJewel;
                                     obj._children.map(v => {
                                         v.visibility = false;
-                                        v.scaling = new BABYLON.Vector3(1, 1, 1)
                                     });
-                                    obj._children[arr[j][h]].visibility = true;
+                                    if (arr[j][h] !== 3) {
+                                        obj._children[arr[j][h]].visibility = true;
+                                    } else {
+                                        obj._children[arr[j][h]+numberPartMap].visibility = true;
+                                        numberPartMap < 2 ? numberPartMap++ : numberPartMap = 0;
+                                    }
                                 } else {
                                     if (genCombination.moveArray[i][j][h] === 1) {
                                         if (!mapLineWin.has(i)) {
@@ -267,6 +279,9 @@ if (BABYLON.Engine.isSupported()) {
         var winLines = WinLines(optionsWinLines, scene);
 
         Promise.all([
+           /* BABYLON.SceneLoader.ImportMesh("", "models/map/", "map.gltf", scene, function (newMeshes) {
+                newMeshes[0].rotation.y = Math.PI*2;
+            }),*/
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
 
             newMeshes[1]._children.map(v => {
@@ -448,18 +463,24 @@ if (BABYLON.Engine.isSupported()) {
                     unEnableButton(minusBetButton);
                 }
             });
+
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
+                newMeshes[0]._children.map(v => {
+                    console.log(v.name);
+                });
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
                     for (var j = 0; j < countColl; j++) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
+                        mesh.scaling = new BABYLON.Vector3(0, 0, 0);
                         shadowGenerator.addShadowCaster(mesh);
                         var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
                         DropJewel.call(obj, scene, startButton, new BABYLON.Vector3(-x, -y, 0));
                         mapAllSymbol.set(j + "-" + i, obj);
                     }
                 }
+
                 newMeshes[0].dispose();
             });
 
@@ -611,21 +632,21 @@ if (BABYLON.Engine.isSupported()) {
                 } else  if (!mapLineWin.size && endScaling && endDrop) {
                         endScaling = false;
                         moveFreeSpin = true;
+                        countSymbolScaling = 15;
                         freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
-                        if (countSymbolWin === -1) {
-                            setTimeout(() => {
-                                countSymbolWin = 0;
-                            }, 750);
-                        }
                 }
             });
             scene.registerAfterRender(function () {
                 if (autoPlay) {
                     var iter = 0;
+                    var iter2 = 0;
                     for (var [key, value] of mapAllSymbol) {
                         value.userData.endInChestAnimation ? iter++ : null;
+                        value.userData.endScalingAnimation ? iter2++ : null;
                     }
-                    if (iter === countSymbolWin) {
+                    // console.log(iter, countSymbolWin);
+                    // console.log(iter2, countSymbolScaling);
+                    if (iter === countSymbolWin || iter2 === countSymbolScaling) {
                         endScaling = false;
                         genCombination.gettingWinnings();
                         roundScore.zeroing();

@@ -79,11 +79,33 @@ function CreateJewel(renderList, textures, position, isMobile)
 
     // glassMaterial.refractionTexture = refractionTexture;
     // meshes.map(v => { v.material = glassMaterial; v.position = position });
-    var partMap = BABYLON.MeshBuilder.CreateBox("partMap", {height: 2, width: 2, depth: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
-    partMap.parent = this;
-    this._children.map(v => {
-        v.material = glassMaterial.clone();
+    // var partMap = BABYLON.MeshBuilder.CreateBox("partMap", {height: 2, width: 2, depth: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE});
+    // partMap.parent = this;
+
+    this._children.map((v,i) => {
         v.particleSystem = ElectricField(v);
+        if (v.name === this.name + "." + "map_1") {
+            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            v.position.x = 1.5;
+            v.position.y = -0.75;
+        } else if (v.name === this.name + "." + "map_2") {
+            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            v.position.x = -1.5;
+            v.position.y = -0.5;
+        } else if (v.name === this.name + "." + "map_3") {
+            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            v.position.y = 1.9;
+        } else {
+            v.material = glassMaterial.clone();
+            v.material.albedoColor = new BABYLON.Color3(0, 0, 0);
+            if (i+1 === 1) {
+                v.material.albedoColor.r = 2.0;
+            } else if (i+1 === 2) {
+                v.material.albedoColor.g = 2.0;
+            } else if (i+1 === 3) {
+                v.material.albedoColor.b = 2.0;
+            }
+        }
     });
     this.userData = {
         speedMove: null,
@@ -93,6 +115,7 @@ function CreateJewel(renderList, textures, position, isMobile)
         inChest: false,
         inFreeSpin: false,
         endInChestAnimation: false,
+        endScalingAnimation: false,
         startDrop: false,
         scalingDown: false,
         visibleSymbol: null

@@ -98,7 +98,7 @@ function ElectricField(emitter) {
 
     // No billboard
     particleSystem.isBillboardBased = false;
-
+    // particleSystem.renderingGroupId = 1;
     // Start the particle system
   //  particleSystem.start();
 
@@ -107,9 +107,9 @@ function ElectricField(emitter) {
     var meshModelVertices = emitter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     particleSystem.startPositionFunction = function (worldMatrix, positionToUpdate, particle) {
 
-        var randX = meshModelVertices[walkPS]*0.85;
-        var randY = meshModelVertices[walkPS + 1]*0.85;
-        var randZ = meshModelVertices[walkPS + 2]*0.85;
+        var randX = meshModelVertices[walkPS]*0.75;
+        var randY = meshModelVertices[walkPS + 1]*0.75;
+        var randZ = meshModelVertices[walkPS + 2]*0.75;
 
         BABYLON.Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 
@@ -120,7 +120,7 @@ function ElectricField(emitter) {
     };
 
 ///////////////////////////////// flame particle
-    var particleSystemFire = new BABYLON.ParticleSystem("particles", 100, scene, null, true);
+    var particleSystemFire = new BABYLON.ParticleSystem("particles", 50, scene, null, true);
 
     //Texture of each particle
     particleSystemFire.particleTexture = new BABYLON.Texture("textures/flare2.png", scene, true,
@@ -131,14 +131,14 @@ function ElectricField(emitter) {
     // Where the particles come from
     var fireEmitter = new BABYLON.TransformNode("");
     fireEmitter.parent = emitter;
-    fireEmitter.position.y -= 0.5;
-    fireEmitter.position.z -= 1.0;
+    fireEmitter.position.y -= 1.5;
+    //fireEmitter.position.z += 2.0;
     particleSystemFire.emitter = fireEmitter; // the starting object, the emitter
-    var emitterType = new BABYLON.SphereParticleEmitter();
-    emitterType.radius = 3.0;
-    particleSystemFire.particleEmitterType = emitterType;
+    // var emitterType = new BABYLON.SphereParticleEmitter();
+    // emitterType.radius = 2.25;
+    // particleSystemFire.particleEmitterType = emitterType;
 
-    particleSystemFire.createCylinderEmitter(2.1,4.0,0,0);
+    particleSystemFire.createCylinderEmitter(2.5,2.0,0,0);
 
     particleSystemFire.startSpriteCellID = 0;
     particleSystemFire.endSpriteCellID = 31;
@@ -205,6 +205,7 @@ function ElectricField(emitter) {
     particleSystemFire.minEmitPower = 0;
     particleSystemFire.maxEmitPower = 0;
     particleSystemFire.updateSpeed = 0.01;
+   // particleSystemFire.renderingGroupId = 1;
 
    return {electric: particleSystem, fire: particleSystemFire};
 }

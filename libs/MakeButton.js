@@ -7,17 +7,16 @@ function MakeButton(name, object, linkToParent, options, manager) {
     pushButton.enabled = true;
     pushButton.pos = pos;
     pushButton.options = options;
-
-    // object.material.albedoTexture.vScale = -1;
-    // object.material.bumpTexture.vScale = -1;
-    // object.material.metallicTexture.vScale = -1;
+    var hl = new BABYLON.HighlightLayer("hl", scene);
+    hl.blurHorizontalSize = 0.5;
+    hl.blurVerticalSize = 0.5;
     pushButton.pointerEnterAnimation = () => {
-        // pushButton.mesh.material.emissiveColor = new BABYLON.Color3(2.0,1.0,0.5);
-        // pushButton.mesh.material.emissiveIntensity = 0.5;
+        if (pushButton.enabled) {
+            hl.addMesh(object, new BABYLON.Color3(0.5, 1.25, 0.75));
+        }
     };
     pushButton.pointerOutAnimation = () => {
-        // pushButton.mesh.material.emissiveColor = new BABYLON.Color3(0.0,0.0,0.0);
-        // pushButton.mesh.material.emissiveIntensity = 0.0;
+        hl.removeMesh(object);
     };
     pushButton.pointerDownAnimation = () => {
         if (pushButton.enabled) {

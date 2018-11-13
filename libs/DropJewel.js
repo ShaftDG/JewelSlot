@@ -4,7 +4,7 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
     var durationPosition = 60;
     object.userData.speedMove = Math.random() * (1.5 - 1.0) + 1.0;
 
-    var animation, animationInChest, animationFreeSpin;
+    var animation, animationInChest, animationFreeSpin, animationScaling;
 
     scene.registerBeforeRender(function () {
         if (object.userData.startDrop) {
@@ -19,15 +19,13 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                     }
                 }
         } else if (object.userData.scalingDown) {
-                object._children.map(v => v.scaling = new BABYLON.Vector3(
-                    v.scaling.x >= 0.1 ? v.scaling.x - 0.05 : v.visibility = false,
-                    v.scaling.y >= 0.1 ? v.scaling.y - 0.05 : v.visibility = false,
-                    v.scaling.z >= 0.1 ? v.scaling.z - 0.05 : v.visibility = false
-                    )
-                );
-                if (!object._children.filter(v => v.visibility).length) {
+                animationScaling = AnimationScalingDown.call(object, new BABYLON.Vector3(0,0,0), 60);
+                object.userData.scalingDown = false;
+                animationScaling.onAnimationEnd = function () {
+                animationScaling.animationStarted = false;
+                    object.scaling = new BABYLON.Vector3(1,1,1);
                     object.position.y = 20;
-                    object.userData.scalingDown = false;
+                    object.userData.endScalingAnimation = true;
                     endScaling = true;
                 }
         } else if (object.userData.inChest && dropInChest) {
@@ -38,7 +36,7 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                     object.userData.endInChestAnimation = true;
                 }
         } else if (object.userData.inFreeSpin && moveFreeSpin) {
-            animationFreeSpin = AnimationFreeSpin.call(object, new BABYLON.Vector3(0, 0, 10), 60);
+            animationFreeSpin = AnimationFreeSpin.call(object, new BABYLON.Vector3(0, 2, 10), 30);
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {
                 animationFreeSpin.animationStarted = false;

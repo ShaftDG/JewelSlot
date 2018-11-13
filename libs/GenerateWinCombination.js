@@ -24,7 +24,7 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [  0 ,  25 ,  100 , 1000 , 5000 ], // SYMB_Square
         [  0 ,  25 ,   50 ,  200 ,  500 ], // SYMB_Diamond
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Pad
-        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_PartMap
+        [  0 ,  0 ,   0 ,  0 ,  0 ], // SYMB_PartMap
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Bell
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Coins
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Horseshoe
@@ -57,11 +57,11 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ]
     ];*/
     this.r = [
-        [ 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0 ],
-        [ 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1 ],
-        [ 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2 ],
-        [ 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0 ],
-        [ 1, 0, 1, 0, 2, 0, 2, 3, 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1 ]
+        [ 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 3, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0 ],
+        [ 1, 0, 2, 3, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1 ],
+        [ 2, 0, 1, 3, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2 ],
+        [ 0, 1, 3, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0 ],
+        [ 1, 0, 1, 0, 2, 0, 2, 3, 1, 3, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1 ]
     ];
 
     this.arrayCombination = [];
@@ -194,7 +194,7 @@ GenerateWinCombination.prototype.generate = function() {
         }
     }
     console.log("=================================");
-    if (this.numFreeSpinSymb >= 2) {
+    if (this.numFreeSpinSymb >= 3) {
         this.numFreeSpin += this.numFreeSpinToRound;
         console.log("FreeSpin: Yes - ", this.numFreeSpin);
         console.log("Move Array Free Spin Symb", this.moveArrayFreeSpinSymb);
