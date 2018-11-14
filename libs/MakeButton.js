@@ -12,7 +12,7 @@ function MakeButton(name, object, linkToParent, options, manager) {
     hl.blurVerticalSize = 0.5;
     pushButton.pointerEnterAnimation = () => {
         if (pushButton.enabled) {
-            hl.addMesh(object, new BABYLON.Color3(0.5, 1.25, 0.75));
+            hl.addMesh(object, new BABYLON.Color3(2.0,1.0,0.5));
         }
     };
     pushButton.pointerOutAnimation = () => {

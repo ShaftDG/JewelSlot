@@ -151,10 +151,10 @@ if (BABYLON.Engine.isSupported()) {
                     var obj = scene.getMeshByName(j + "-" + i);
                     scene.stopAnimation(obj);
                     obj._children.map(v => {
-                        v.particleSystem.electric.reset();
-                        v.particleSystem.fire.reset();
-                        v.particleSystem.electric.stop();
-                        v.particleSystem.fire.stop();
+                        // v.particleSystem.electric.reset();
+                        v.particleSystem/*.fire*/.reset();
+                        // v.particleSystem.electric.stop();
+                        v.particleSystem/*.fire*/.stop();
                         v.scaling = new BABYLON.Vector3(1,1,1);
                         v.rotation = BABYLON.Vector3.Zero();
                         if (v.name === obj.name + "." + "map_1") {
@@ -277,17 +277,14 @@ if (BABYLON.Engine.isSupported()) {
             z: -0.75
         };
         var winLines = WinLines(optionsWinLines, scene);
-
+        var rightCheckWinLines, leftCheckWinLines;
         Promise.all([
-           /* BABYLON.SceneLoader.ImportMesh("", "models/map/", "map.gltf", scene, function (newMeshes) {
-                newMeshes[0].rotation.y = Math.PI*2;
-            }),*/
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
-
-            newMeshes[1]._children.map(v => {
+            rightCheckWinLines = newMeshes[1];
+            rightCheckWinLines._children.map(v => {
                     var mat = v.material.clone();
                     mat.reflectionTexture = hdrTexture;
-                    mat.emissiveColor = new BABYLON.Color3(-1, -1, -1);
+                    mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
                     mat.emissiveIntensity = 0.0;
                     v.material = mat;
                  // console.log(v.name, v.material.emissiveTexture);
@@ -299,10 +296,10 @@ if (BABYLON.Engine.isSupported()) {
             newMeshes[0].position.y = 7.68;
             newMeshes[0].position.z = -0.75;
 
-            var leftLines = newMeshes[0].clone("leftLines");
-            leftLines.position.x = -newMeshes[0].position.x;
-            leftLines.position.y = newMeshes[0].position.y;
-            leftLines.position.z = newMeshes[0].position.z;
+            leftCheckWinLines = newMeshes[0].clone("leftLines");
+            leftCheckWinLines.position.x = -newMeshes[0].position.x;
+            leftCheckWinLines.position.y = newMeshes[0].position.y;
+            leftCheckWinLines.position.z = newMeshes[0].position.z;
         }),
 
         BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.gltf", scene, function (newMeshes) {
@@ -415,6 +412,12 @@ if (BABYLON.Engine.isSupported()) {
                 startRoundGame();
                 showRoundScore = true;
                 winLines.map(v => {v.setEnabled(false)/*; v.renderingGroupId = 0;*/});
+                rightCheckWinLines._children.map(v => {
+                    v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                });
+                leftCheckWinLines._children.map(v => {
+                    v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                });
             });
 
             var optionSecondButton = {
@@ -465,9 +468,9 @@ if (BABYLON.Engine.isSupported()) {
             });
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
-                newMeshes[0]._children.map(v => {
+               /* newMeshes[0]._children.map(v => {
                     console.log(v.name);
-                });
+                });*/
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
                     for (var j = 0; j < countColl; j++) {

@@ -95,7 +95,7 @@ function AnimationFreeSpin(targetForward, duration)
     var animationScalingPartMap = new BABYLON.Animation("animationScalingPartMap", "scaling", 1.0, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 
     // the object destination position
-    var nextPos = new BABYLON.Vector3(2.5,2.5,2.5);
+    var nextPos = new BABYLON.Vector3(3.25,3.25,3.25);
 
     // Animation keys
     var keysTorus = [];
@@ -118,7 +118,7 @@ function AnimationFreeSpin(targetForward, duration)
 
     // Animation keys
     var keysTorus = [];
-    keysTorus.push({ frame: 50, value: new BABYLON.Color3(0, 0, 0) });
+    keysTorus.push({ frame: 20, value: new BABYLON.Color3(0, 0, 0) });
     keysTorus.push({ frame: 70, value: nextPos });
     keysTorus.push({ frame: 80, value: new BABYLON.Color3(0, 0, 0) });
     animationEmissive.setKeys(keysTorus);
@@ -137,39 +137,27 @@ function AnimationFreeSpin(targetForward, duration)
     partMap.animations.push(animationScalingPartMap);
     partMap.animations.push(animationEmissive);
 
- /*   var hl = new BABYLON.HighlightLayer("hl", scene);
-    hl.blurHorizontalSize = 0;
-    hl.blurVerticalSize = 0;
-    var eventStopPositionPartMap = new BABYLON.AnimationEvent(45, function() {
-        hl.addMesh(partMap, new BABYLON.Color3.FromHexString("#fde300"));
+    var eventStartFire = new BABYLON.AnimationEvent(0, function() {
+        object._children.map(v => {
+            if (v.visibility) {
+                v.particleSystem/*.electric*/.start();
+                // v.particleSystem.fire.start();
+            }
+        });
     }, true);
+// Attach your event to your animation
+    animationEmissive.addEvent(eventStartFire);
 
-    animationPositionPartMap.addEvent(eventStopPositionPartMap);
-
-    for (var i = 1; i <= 10; i++) {
-        var event = new BABYLON.AnimationEvent(45+i, function() {
-            hl.blurHorizontalSize += 0.3;
-            hl.blurVerticalSize += 0.3;
-        }, true);
-
-        animationPositionPartMap.addEvent(event);
-    }
-
-    for (var i = 1; i <= 5; i++) {
-        var event = new BABYLON.AnimationEvent(55+i, function() {
-            hl.blurHorizontalSize -= 0.6;
-            hl.blurVerticalSize -= 0.6;
-        }, true);
-
-        animationPositionPartMap.addEvent(event);
-
-    }
-
-    var eventStopPositionPartMapEnd = new BABYLON.AnimationEvent(60, function() {
-        hl.removeMesh(partMap);
+    var eventStopFire = new BABYLON.AnimationEvent(70, function() {
+        object._children.map(v => {
+            // v.particleSystem/*.electric*/.reset();
+            // v.particleSystem.fire.reset();
+            v.particleSystem/*.electric*/.stop();
+            // v.particleSystem.fire.stop();
+        });
     }, true);
-
-    animationPositionPartMap.addEvent(eventStopPositionPartMapEnd);*/
+// Attach your event to your animation
+    animationEmissive.addEvent(eventStopFire);
 
     scene.beginAnimation(partMap, 0, 80, false, duration);
 
