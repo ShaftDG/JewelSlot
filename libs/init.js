@@ -65,7 +65,7 @@ if (BABYLON.Engine.isSupported()) {
         var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
-        // camera.attachControl(canvas, false);
+        camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
         camera.upperRadiusLimit = 50;
