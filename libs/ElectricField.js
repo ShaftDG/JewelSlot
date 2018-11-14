@@ -13,7 +13,7 @@ function ElectricField(emitter) {
     };
 
     // Create a particle system
-    var particleSystem = new BABYLON.ParticleSystem("particles", 350, scene, effect);
+    var particleSystem = new BABYLON.ParticleSystem("particles", 500, scene, effect);
 
     //Texture of each particle
     particleSystem.particleTexture = new BABYLON.Texture("textures/flare.png", scene, true,
@@ -24,14 +24,14 @@ function ElectricField(emitter) {
 
     // Size of each particle (random between...
     particleSystem.minSize = 0.5;
-    particleSystem.maxSize = 3.0;
+    particleSystem.maxSize = 2.0;
 
     // Life time of each particle (random between...
     particleSystem.minLifeTime = 0.1;
     particleSystem.maxLifeTime = 0.4;
 
     // Emission rate
-    particleSystem.emitRate = 350;
+    particleSystem.emitRate = 500;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
     particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
@@ -44,7 +44,7 @@ function ElectricField(emitter) {
     particleSystem.maxInitialRotation = Math.PI;
 
     // Angular speed, in radians
-    particleSystem.minAngularSpeed = 0;
+    particleSystem.minAngularSpeed = -Math.PI / 5;
     particleSystem.maxAngularSpeed = Math.PI / 5;
 
     // Speed

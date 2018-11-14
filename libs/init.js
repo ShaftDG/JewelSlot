@@ -151,20 +151,27 @@ if (BABYLON.Engine.isSupported()) {
                     var obj = scene.getMeshByName(j + "-" + i);
                     scene.stopAnimation(obj);
                     obj._children.map(v => {
-                        // v.particleSystem.electric.reset();
-                        v.particleSystem/*.fire*/.reset();
-                        // v.particleSystem.electric.stop();
-                        v.particleSystem/*.fire*/.stop();
+                        if (v.particleSystem.electric) {
+                            v.particleSystem.electric.reset();
+                            v.particleSystem.electric.stop();
+                            v.particleSystem.spark.reset();
+                            v.particleSystem.spark.stop();
+                        } else {
+                            v.particleSystem.reset();
+                            v.particleSystem.stop();
+                        }
+
                         v.scaling = new BABYLON.Vector3(1,1,1);
                         v.rotation = BABYLON.Vector3.Zero();
-                        if (v.name === obj.name + "." + "map_1") {
-                            v.position.x = 1.5;
-                            v.position.y = -0.75;
-                        } else if (v.name === obj.name + "." + "map_2") {
-                            v.position.x = -1.5;
-                            v.position.y = -0.5;
-                        } else if (v.name === obj.name + "." + "map_3") {
-                            v.position.y = 1.9;
+                        if (
+                            v.name === obj.name + "." + "map_1" ||
+                            v.name === obj.name + "." + "map_2" ||
+                            v.name === obj.name + "." + "map_3"
+                        ) {
+                            var center = v.userData.center;
+                            v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
+                            v.position = new BABYLON.Vector3(0,0,0).subtract(center);
+                            v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
                         }
                     });
                     obj.position.y = 20;

@@ -16,9 +16,25 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                         animation.animationStarted = false;
                         object.userData.startDrop = false;
                         endDrop = true;
+                        if (!object.userData.scalingDown) {
+                            object._children.map(v => {
+                                if (v.visibility) {
+                                    if (v.particleSystem.spark) {
+                                        v.particleSystem.spark.start();
+                                        AnimationRotationPartMap.call(object, 60);
+                                    }
+                                } else {
+                                    if (v.particleSystem.spark) {
+                                        v.particleSystem.spark.reset();
+                                        v.particleSystem.spark.stop();
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
         } else if (object.userData.scalingDown) {
+                scene.stopAnimation(object);
                 animationScaling = AnimationScalingDown.call(object, new BABYLON.Vector3(0,0,0), 60);
                 object.userData.scalingDown = false;
                 animationScaling.onAnimationEnd = function () {
@@ -29,6 +45,7 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                     endScaling = true;
                 }
         } else if (object.userData.inChest && dropInChest) {
+                scene.stopAnimation(object);
                 animationInChest = AnimationMoveInChest.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60);
                 object.userData.inChest = false;
                 animationInChest.onAnimationEnd = function () {
@@ -36,6 +53,14 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                     object.userData.endInChestAnimation = true;
                 }
         } else if (object.userData.inFreeSpin && moveFreeSpin) {
+            scene.stopAnimation(object);
+            object.rotation = BABYLON.Vector3.Zero();
+            object._children.map(v => {
+                if (v.userData) {
+                    v.setPivotMatrix(BABYLON.Matrix.Translation(0,0,0));
+                    v.position = BABYLON.Vector3.Zero();
+                }
+            });
             animationFreeSpin = AnimationFreeSpin.call(object, new BABYLON.Vector3(0, 2, 10), 30);
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {

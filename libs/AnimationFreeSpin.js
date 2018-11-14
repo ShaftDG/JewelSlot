@@ -3,12 +3,12 @@ function AnimationFreeSpin(targetForward, duration)
     var object = this;
 
     //Create a Vector3 animationForward at 30 FPS
-    var animationForward = new BABYLON.Animation("animationForward", "position", 1.25, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+    var animationForward = new BABYLON.Animation("animationForward", "position", 1.0, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
     var keysTorus = [];
     keysTorus.push({ frame: 0, value: object.position });
-    keysTorus.push({ frame: 180, value: targetForward });
+    keysTorus.push({ frame: 90, value: targetForward });
     // keysTorus.push({ frame: 120, value: targetForward });
     // keysTorus.push({ frame: 180, value: object.position });
     animationForward.setKeys(keysTorus);
@@ -41,7 +41,7 @@ function AnimationFreeSpin(targetForward, duration)
     object.animations.push(animationForward);
 
     //Finally, launch animations on object, from key 0 to key 120 with loop activated
-    var anim = scene.beginAnimation(object, 0, 180, false, duration);
+    var anim = scene.beginAnimation(object, 0, 90, false, duration);
 
 
     var partMap;
@@ -95,7 +95,7 @@ function AnimationFreeSpin(targetForward, duration)
     var animationScalingPartMap = new BABYLON.Animation("animationScalingPartMap", "scaling", 1.0, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 
     // the object destination position
-    var nextPos = new BABYLON.Vector3(3.25,3.25,3.25);
+    var nextPos = new BABYLON.Vector3(3.5,3.5,3.5);
 
     // Animation keys
     var keysTorus = [];
@@ -118,8 +118,8 @@ function AnimationFreeSpin(targetForward, duration)
 
     // Animation keys
     var keysTorus = [];
-    keysTorus.push({ frame: 20, value: new BABYLON.Color3(0, 0, 0) });
-    keysTorus.push({ frame: 70, value: nextPos });
+    keysTorus.push({ frame: 40, value: new BABYLON.Color3(0, 0, 0) });
+    keysTorus.push({ frame: 65, value: nextPos });
     keysTorus.push({ frame: 80, value: new BABYLON.Color3(0, 0, 0) });
     animationEmissive.setKeys(keysTorus);
 
@@ -140,8 +140,13 @@ function AnimationFreeSpin(targetForward, duration)
     var eventStartFire = new BABYLON.AnimationEvent(0, function() {
         object._children.map(v => {
             if (v.visibility) {
-                v.particleSystem/*.electric*/.start();
-                // v.particleSystem.fire.start();
+                if (v.particleSystem.electric) {
+                    v.particleSystem.electric.start();
+                    v.particleSystem.spark.reset();
+                    v.particleSystem.spark.stop();
+                } else {
+                    v.particleSystem.start();
+                }
             }
         });
     }, true);
@@ -150,10 +155,13 @@ function AnimationFreeSpin(targetForward, duration)
 
     var eventStopFire = new BABYLON.AnimationEvent(70, function() {
         object._children.map(v => {
-            // v.particleSystem/*.electric*/.reset();
-            // v.particleSystem.fire.reset();
-            v.particleSystem/*.electric*/.stop();
-            // v.particleSystem.fire.stop();
+            if (v.particleSystem.electric) {
+                v.particleSystem.electric.reset();
+                v.particleSystem.electric.stop();
+            } else {
+                v.particleSystem.reset();
+                v.particleSystem.stop();
+            }
         });
     }, true);
 // Attach your event to your animation

@@ -67,8 +67,11 @@ function AnimationMoveForward(targetForward, duration)
     var eventStartElectric = new BABYLON.AnimationEvent(0, function() {
         object._children.map(v => {
             if (v.visibility) {
-                v.particleSystem/*.electric*/.start();
-                // v.particleSystem.fire.start();
+                if (v.particleSystem.electric) {
+                    v.particleSystem.electric.start();
+                } else {
+                    v.particleSystem.start();
+                }
             }
         });
     }, true);
@@ -77,10 +80,13 @@ function AnimationMoveForward(targetForward, duration)
 
     var eventStopElectric = new BABYLON.AnimationEvent(120, function() {
         object._children.map(v => {
-            v.particleSystem/*.electric*/.reset();
-            // v.particleSystem.fire.reset();
-            v.particleSystem/*.electric*/.stop();
-            // v.particleSystem.fire.stop();
+            if (v.particleSystem.electric) {
+                v.particleSystem.electric.reset();
+                v.particleSystem.electric.stop();
+            } else {
+                v.particleSystem.reset();
+                v.particleSystem.stop();
+            }
         });
     }, true);
 // Attach your event to your animation

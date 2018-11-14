@@ -84,20 +84,21 @@ function CreateJewel(renderList, textures, position, isMobile)
 
     this._children.map((v,i) => {
         v.material.emissiveIntensity = 5.0;
-        if (v.name === this.name + "." + "map_1") {
-            v.particleSystem = ElectricField(v);
+        if (
+            v.name === this.name + "." + "map_1" ||
+            v.name === this.name + "." + "map_2" ||
+            v.name === this.name + "." + "map_3"
+        ) {
             v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
-            v.position.x = 1.5;
-            v.position.y = -0.75;
-        } else if (v.name === this.name + "." + "map_2") {
-            v.particleSystem = ElectricField(v);
-            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
-            v.position.x = -1.5;
-            v.position.y = -0.5;
-        } else if (v.name === this.name + "." + "map_3") {
-            v.particleSystem = ElectricField(v);
-            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
-            v.position.y = 1.9;
+            var center = v.getBoundingInfo().boundingBox.center;
+            v.userData = {center: center};
+            v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
+            v.position = new BABYLON.Vector3(0,0,0).subtract(center);
+            v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
+            v.particleSystem = {
+                electric: ElectricField(v),
+                spark: StarBackground(v),
+            };
         } else {
             v.particleSystem = FireParticles(v);
             v.material = glassMaterial.clone();

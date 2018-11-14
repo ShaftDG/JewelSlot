@@ -92,7 +92,7 @@ function FireParticles(emitter) {
     var meshModelVertices = emitter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     particleSystemFire.startPositionFunction = function (worldMatrix, positionToUpdate, particle) {
 
-        var randX = meshModelVertices[walkPS];
+        var randX = meshModelVertices[walkPS]*0.8;
         var randY = meshModelVertices[walkPS + 1];
         var randZ = meshModelVertices[walkPS + 2]*1.05;
 
