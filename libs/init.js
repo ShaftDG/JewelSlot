@@ -52,17 +52,22 @@ if (BABYLON.Engine.isSupported()) {
         var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
         hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
         texturesJewel = [...texturesJewel, hdrTexture];
+        var textureMapAlbedo = new BABYLON.Texture("models/PirateTreasureMapScroll_diffuse.jpg", scene);
+        var textureMapEmissive = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
+        /*textureMap.uOffset = -1.0;
+        textureMap.vOffset = 1.0;*/
+        texturesJewel = [...texturesJewel, textureMapAlbedo];
     /*    var emissiveTextureMap = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
         texturesJewel = [...texturesJewel, emissiveTextureMap];*/
 
         var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.35, width: 0.4});
         var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.36, width: 0.4});
-        var bet = new TextLabel( new BABYLON.Vector3(0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
-        var lines = new TextLabel( new BABYLON.Vector3(-1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
+        var bet = new TextLabel( new BABYLON.Vector3(-0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
+        var lines = new TextLabel( new BABYLON.Vector3(1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
 
         var freeSpin = new TextLabel( new BABYLON.Vector3(-25, 0, 0), scene, 300, {height:0.35*8, width: 0.4*8});
 
-        var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
+        var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
         camera.attachControl(canvas, false);
@@ -151,6 +156,18 @@ if (BABYLON.Engine.isSupported()) {
                     var obj = scene.getMeshByName(j + "-" + i);
                     scene.stopAnimation(obj);
                     obj._children.map(v => {
+                        if (
+                            v.name === obj.name + "." + "map_1" ||
+                            v.name === obj.name + "." + "map_2" ||
+                            v.name === obj.name + "." + "map_3"
+                        ) {
+                            var center = v.userData.center;
+                            v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
+                            v.position = new BABYLON.Vector3(0,0,0).subtract(center);
+                            v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
+                            v.material = v.userData.defaultMaterial;
+                        }
+                        v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                         if (v.particleSystem.electric) {
                             v.particleSystem.electric.reset();
                             v.particleSystem.electric.stop();
@@ -163,20 +180,10 @@ if (BABYLON.Engine.isSupported()) {
 
                         v.scaling = new BABYLON.Vector3(1,1,1);
                         v.rotation = BABYLON.Vector3.Zero();
-                        if (
-                            v.name === obj.name + "." + "map_1" ||
-                            v.name === obj.name + "." + "map_2" ||
-                            v.name === obj.name + "." + "map_3"
-                        ) {
-                            var center = v.userData.center;
-                            v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
-                            v.position = new BABYLON.Vector3(0,0,0).subtract(center);
-                            v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
-                        }
                     });
                     obj.position.y = 20;
                     obj.position.z = 0;
-                    obj.scaling = new BABYLON.Vector3(-1, 1, 1);
+                    obj.scaling = new BABYLON.Vector3(1, 1, 1);
                     obj.rotation = BABYLON.Vector3.Zero();
                     obj.rotate(BABYLON.Axis.Z, (Math.random() < 0.5 ? -1 : 1) * Math.PI, BABYLON.Space.WORLD);
                     obj.userData.rotateDestination = new BABYLON.Vector3(0, 0, (Math.random() < 0.5 ? -1 : 1) * 2 * Math.PI);
@@ -478,15 +485,22 @@ if (BABYLON.Engine.isSupported()) {
                /* newMeshes[0]._children.map(v => {
                     console.log(v.name);
                 });*/
+                var box = BABYLON.Mesh.CreateBox("box", 2.0, scene);
+                box.visibility = false;
+                box.position = new BABYLON.Vector3(-0.75, 4.2, 9.0);
+                box.userData = {
+                    beginPosition: box.position.clone()
+                };
+
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
                     for (var j = 0; j < countColl; j++) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
-                        mesh.scaling = new BABYLON.Vector3(0, 0, 0);
-                        shadowGenerator.addShadowCaster(mesh);
+                        mesh.scaling = new BABYLON.Vector3(0.001, 0.001, 0.001);
+                     //   shadowGenerator.addShadowCaster(mesh);
                         var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
-                        DropJewel.call(obj, scene, startButton, new BABYLON.Vector3(-x, -y, 0));
+                        DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0));
                         mapAllSymbol.set(j + "-" + i, obj);
                     }
                 }
@@ -700,4 +714,14 @@ if (BABYLON.Engine.isSupported()) {
     window.addEventListener("resize", function () {
         engine.resize();
     });
+    /*window.onbeforeunload = function (event) {
+        var message = 'Important: Please click on \'Save\' button to leave this page.';
+        if (typeof event == 'undefined') {
+            event = window.event;
+        }
+        if (event) {
+            event.returnValue = message;
+        }
+        return message;
+    };*/
 }

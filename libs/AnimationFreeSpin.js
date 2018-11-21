@@ -1,4 +1,4 @@
-function AnimationFreeSpin(targetForward, duration)
+function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
 {
     var object = this;
 
@@ -119,7 +119,7 @@ function AnimationFreeSpin(targetForward, duration)
     // Animation keys
     var keysTorus = [];
     keysTorus.push({ frame: 40, value: new BABYLON.Color3(0, 0, 0) });
-    keysTorus.push({ frame: 65, value: nextPos });
+    keysTorus.push({ frame: 60, value: nextPos });
     keysTorus.push({ frame: 80, value: new BABYLON.Color3(0, 0, 0) });
     animationEmissive.setKeys(keysTorus);
 
@@ -138,34 +138,39 @@ function AnimationFreeSpin(targetForward, duration)
     partMap.animations.push(animationEmissive);
 
     var eventStartFire = new BABYLON.AnimationEvent(0, function() {
-        object._children.map(v => {
-            if (v.visibility) {
-                if (v.particleSystem.electric) {
-                    v.particleSystem.electric.start();
-                    v.particleSystem.spark.reset();
-                    v.particleSystem.spark.stop();
-                } else {
-                    v.particleSystem.start();
-                }
-            }
-        });
-    }, true);
+        if (partMap.particleSystem.electric) {
+            partMap.particleSystem.electric.start();
+            partMap.particleSystem.spark.reset();
+            partMap.particleSystem.spark.stop();
+        } else {
+            partMap.particleSystem.start();
+        }
+    });
 // Attach your event to your animation
     animationEmissive.addEvent(eventStartFire);
-
-    var eventStopFire = new BABYLON.AnimationEvent(70, function() {
-        object._children.map(v => {
-            if (v.particleSystem.electric) {
-                v.particleSystem.electric.reset();
-                v.particleSystem.electric.stop();
-            } else {
-                v.particleSystem.reset();
-                v.particleSystem.stop();
-            }
-        });
+    var eventStopFire = new BABYLON.AnimationEvent(65, function() {
+        if (partMap.particleSystem.electric) {
+            partMap.particleSystem.electric.reset();
+            partMap.particleSystem.electric.stop();
+        } else {
+            partMap.particleSystem.reset();
+            partMap.particleSystem.stop();
+        }
     }, true);
 // Attach your event to your animation
     animationEmissive.addEvent(eventStopFire);
+
+    var eventFireBall = new BABYLON.AnimationEvent(70, function() {
+        pointsFreeSpinObject.box.visibility = true;
+        var animation = AnimationPointsFreeSpin.call(pointsFreeSpinObject.box, pointsFreeSpinObject.freeSpin.anchor.position.clone(), 30);
+        animation.onAnimationEnd = function () {
+            animation.animationStarted = false;
+            pointsFreeSpinObject.box.position = pointsFreeSpinObject.box.userData.beginPosition;
+        };
+        Combustion.call(partMap);
+    }, true);
+// Attach your event to your animation
+    animationEmissive.addEvent(eventFireBall);
 
     scene.beginAnimation(partMap, 0, 80, false, duration);
 

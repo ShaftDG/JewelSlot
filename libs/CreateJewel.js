@@ -89,15 +89,19 @@ function CreateJewel(renderList, textures, position, isMobile)
             v.name === this.name + "." + "map_2" ||
             v.name === this.name + "." + "map_3"
         ) {
+            v.material.albedoColor = new BABYLON.Color3(1.5, 1.5, 1.5);
             v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
             var center = v.getBoundingInfo().boundingBox.center;
-            v.userData = {center: center};
             v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
             v.position = new BABYLON.Vector3(0,0,0).subtract(center);
             v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
             v.particleSystem = {
                 electric: ElectricField(v),
                 spark: StarBackground(v),
+            };
+            v.userData = {
+                center: center,
+                defaultMaterial: v.material
             };
         } else {
             v.particleSystem = FireParticles(v);

@@ -1,0 +1,696 @@
+#if defined(BUMP) || !defined(NORMAL) || defined(FORCENORMALFORWARD) || defined(SPECULARAA)
+#extension GL_OES_standard_derivatives : enable
+#endif
+#ifdef LODBASEDMICROSFURACE
+#extension GL_EXT_shader_texture_lod : enable
+#endif
+#ifdef LOGARITHMICDEPTH
+#extension GL_EXT_frag_depth : enable
+#endif
+precision highp float;
+#include<__decl__pbrFragment>
+uniform vec4 vEyePosition;
+uniform vec3 vAmbientColor;
+uniform vec4 vCameraInfos;
+
+varying vec3 vPositionW;
+#ifdef MAINUV1
+varying vec2 vMainUV1;
+#endif 
+#ifdef MAINUV2 
+varying vec2 vMainUV2;
+#endif 
+#ifdef NORMAL
+varying vec3 vNormalW;
+#if defined(USESPHERICALFROMREFLECTIONMAP) && defined(USESPHERICALINVERTEX)
+varying vec3 vEnvironmentIrradiance;
+#endif
+#endif
+#ifdef VERTEXCOLOR
+varying vec4 vColor;
+#endif
+
+#include<__decl__lightFragment>[0..maxSimultaneousLights]
+
+#ifdef ALBEDO
+#if ALBEDODIRECTUV == 1
+#define vAlbedoUV vMainUV1
+#elif ALBEDODIRECTUV == 2
+#define vAlbedoUV vMainUV2
+#else
+varying vec2 vAlbedoUV;
+#endif
+uniform sampler2D albedoSampler;
+#endif
+#ifdef AMBIENT
+#if AMBIENTDIRECTUV == 1
+#define vAmbientUV vMainUV1
+#elif AMBIENTDIRECTUV == 2
+#define vAmbientUV vMainUV2
+#else
+varying vec2 vAmbientUV;
+#endif
+uniform sampler2D ambientSampler;
+#endif
+#ifdef OPACITY
+#if OPACITYDIRECTUV == 1
+#define vOpacityUV vMainUV1
+#elif OPACITYDIRECTUV == 2
+#define vOpacityUV vMainUV2
+#else
+varying vec2 vOpacityUV;
+#endif
+uniform sampler2D opacitySampler;
+#endif
+#ifdef EMISSIVE
+#if EMISSIVEDIRECTUV == 1
+#define vEmissiveUV vMainUV1
+#elif EMISSIVEDIRECTUV == 2
+#define vEmissiveUV vMainUV2
+#else
+varying vec2 vEmissiveUV;
+#endif
+uniform sampler2D emissiveSampler;
+#endif
+#ifdef LIGHTMAP
+#if LIGHTMAPDIRECTUV == 1
+#define vLightmapUV vMainUV1
+#elif LIGHTMAPDIRECTUV == 2
+#define vLightmapUV vMainUV2
+#else
+varying vec2 vLightmapUV;
+#endif
+uniform sampler2D lightmapSampler;
+#endif
+#ifdef REFLECTIVITY
+#if REFLECTIVITYDIRECTUV == 1
+#define vReflectivityUV vMainUV1
+#elif REFLECTIVITYDIRECTUV == 2
+#define vReflectivityUV vMainUV2
+#else
+varying vec2 vReflectivityUV;
+#endif
+uniform sampler2D reflectivitySampler;
+#endif
+#ifdef MICROSURFACEMAP
+#if MICROSURFACEMAPDIRECTUV == 1
+#define vMicroSurfaceSamplerUV vMainUV1
+#elif MICROSURFACEMAPDIRECTUV == 2
+#define vMicroSurfaceSamplerUV vMainUV2
+#else
+varying vec2 vMicroSurfaceSamplerUV;
+#endif
+uniform sampler2D microSurfaceSampler;
+#endif
+
+#ifdef REFRACTION
+#ifdef REFRACTIONMAP_3D
+#define sampleRefraction(s,c) textureCube(s,c)
+uniform samplerCube refractionSampler;
+#ifdef LODBASEDMICROSFURACE
+#define sampleRefractionLod(s,c,l) textureCubeLodEXT(s,c,l)
+#else
+uniform samplerCube refractionSamplerLow;
+uniform samplerCube refractionSamplerHigh;
+#endif
+#else
+#define sampleRefraction(s,c) texture2D(s,c)
+uniform sampler2D refractionSampler;
+#ifdef LODBASEDMICROSFURACE
+#define sampleRefractionLod(s,c,l) texture2DLodEXT(s,c,l)
+#else
+uniform samplerCube refractionSamplerLow;
+uniform samplerCube refractionSamplerHigh;
+#endif
+#endif
+#endif
+
+#ifdef REFLECTION
+#ifdef REFLECTIONMAP_3D
+#define sampleReflection(s,c) textureCube(s,c)
+uniform samplerCube reflectionSampler;
+#ifdef LODBASEDMICROSFURACE
+#define sampleReflectionLod(s,c,l) textureCubeLodEXT(s,c,l)
+#else
+uniform samplerCube reflectionSamplerLow;
+uniform samplerCube reflectionSamplerHigh;
+#endif
+#else
+#define sampleReflection(s,c) texture2D(s,c)
+uniform sampler2D reflectionSampler;
+#ifdef LODBASEDMICROSFURACE
+#define sampleReflectionLod(s,c,l) texture2DLodEXT(s,c,l)
+#else
+uniform samplerCube reflectionSamplerLow;
+uniform samplerCube reflectionSamplerHigh;
+#endif
+#endif
+#ifdef REFLECTIONMAP_SKYBOX
+varying vec3 vPositionUVW;
+#else
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
+varying vec3 vDirectionW;
+#endif
+#endif
+#include<reflectionFunction>
+#endif
+#ifdef ENVIRONMENTBRDF
+uniform sampler2D environmentBrdfSampler;
+#endif
+
+#ifndef FROMLINEARSPACE
+#define FROMLINEARSPACE;
+#endif
+#include<imageProcessingDeclaration>
+#include<helperFunctions>
+#include<imageProcessingFunctions>
+
+#include<shadowsFragmentFunctions>
+#include<pbrFunctions>
+#include<harmonicsFunctions>
+#include<pbrLightFunctions>
+#include<bumpFragmentFunctions>
+#include<clipPlaneFragmentDeclaration>
+#include<logDepthDeclaration>
+
+#include<fogFragmentDeclaration>
+void main(void) {
+#include<clipPlaneFragment>
+
+
+vec3 viewDirectionW=normalize(vEyePosition.xyz-vPositionW);
+#ifdef NORMAL
+vec3 normalW=normalize(vNormalW);
+#else
+vec3 normalW=normalize(cross(dFdx(vPositionW),dFdy(vPositionW)))*vEyePosition.w;
+#endif
+#include<bumpFragment>
+#ifdef SPECULARAA
+vec3 nDfdx=dFdx(normalW.xyz);
+vec3 nDfdy=dFdy(normalW.xyz);
+float slopeSquare=max(dot(nDfdx,nDfdx),dot(nDfdy,nDfdy));
+
+float geometricRoughnessFactor=pow(clamp(slopeSquare ,0.,1.),0.333);
+
+float geometricAlphaGFactor=sqrt(slopeSquare);
+#else
+float geometricRoughnessFactor=0.;
+#endif
+#if defined(FORCENORMALFORWARD) && defined(NORMAL)
+vec3 faceNormal=normalize(cross(dFdx(vPositionW),dFdy(vPositionW)))*vEyePosition.w;
+#if defined(TWOSIDEDLIGHTING)
+faceNormal=gl_FrontFacing ? faceNormal : -faceNormal;
+#endif
+normalW*=sign(dot(normalW,faceNormal));
+#endif
+#if defined(TWOSIDEDLIGHTING) && defined(NORMAL)
+normalW=gl_FrontFacing ? normalW : -normalW;
+#endif
+
+
+vec3 surfaceAlbedo=vAlbedoColor.rgb;
+
+float alpha=vAlbedoColor.a;
+#ifdef ALBEDO
+vec4 albedoTexture=texture2D(albedoSampler,vAlbedoUV+uvOffset);
+#if defined(ALPHAFROMALBEDO) || defined(ALPHATEST)
+alpha*=albedoTexture.a;
+#endif
+surfaceAlbedo*=toLinearSpace(albedoTexture.rgb);
+surfaceAlbedo*=vAlbedoInfos.y;
+#endif
+
+#ifdef OPACITY
+vec4 opacityMap=texture2D(opacitySampler,vOpacityUV+uvOffset);
+#ifdef OPACITYRGB
+alpha=getLuminance(opacityMap.rgb);
+#else
+alpha*=opacityMap.a;
+#endif
+alpha*=vOpacityInfos.y;
+#endif
+#ifdef VERTEXALPHA
+alpha*=vColor.a;
+#endif
+#if !defined(LINKREFRACTIONTOTRANSPARENCY) && !defined(ALPHAFRESNEL)
+#ifdef ALPHATEST
+if (alpha<ALPHATESTVALUE)
+discard;
+#ifndef ALPHABLEND
+
+alpha=1.0;
+#endif
+#endif
+#endif
+#include<depthPrePass>
+#ifdef VERTEXCOLOR
+surfaceAlbedo*=vColor.rgb;
+#endif
+
+vec3 ambientOcclusionColor=vec3(1.,1.,1.);
+#ifdef AMBIENT
+vec3 ambientOcclusionColorMap=texture2D(ambientSampler,vAmbientUV+uvOffset).rgb*vAmbientInfos.y;
+#ifdef AMBIENTINGRAYSCALE
+ambientOcclusionColorMap=vec3(ambientOcclusionColorMap.r,ambientOcclusionColorMap.r,ambientOcclusionColorMap.r);
+#endif
+ambientOcclusionColor=mix(ambientOcclusionColor,ambientOcclusionColorMap,vAmbientInfos.z);
+#endif
+#ifdef UNLIT
+vec3 diffuseBase=vec3(1.,1.,1.);
+#else
+
+float microSurface=vReflectivityColor.a;
+vec3 surfaceReflectivityColor=vReflectivityColor.rgb;
+#ifdef METALLICWORKFLOW
+vec2 metallicRoughness=surfaceReflectivityColor.rg;
+#ifdef REFLECTIVITY
+vec4 surfaceMetallicColorMap=texture2D(reflectivitySampler,vReflectivityUV+uvOffset);
+#ifdef AOSTOREINMETALMAPRED
+vec3 aoStoreInMetalMap=vec3(surfaceMetallicColorMap.r,surfaceMetallicColorMap.r,surfaceMetallicColorMap.r);
+ambientOcclusionColor=mix(ambientOcclusionColor,aoStoreInMetalMap,vReflectivityInfos.z);
+#endif
+#ifdef METALLNESSSTOREINMETALMAPBLUE
+metallicRoughness.r*=surfaceMetallicColorMap.b;
+#else
+metallicRoughness.r*=surfaceMetallicColorMap.r;
+#endif
+#ifdef ROUGHNESSSTOREINMETALMAPALPHA
+metallicRoughness.g*=surfaceMetallicColorMap.a;
+#else
+#ifdef ROUGHNESSSTOREINMETALMAPGREEN
+metallicRoughness.g*=surfaceMetallicColorMap.g;
+#endif
+#endif
+#endif
+#ifdef MICROSURFACEMAP
+vec4 microSurfaceTexel=texture2D(microSurfaceSampler,vMicroSurfaceSamplerUV+uvOffset)*vMicroSurfaceSamplerInfos.y;
+metallicRoughness.g*=microSurfaceTexel.r;
+#endif
+
+microSurface=1.0-metallicRoughness.g;
+
+vec3 baseColor=surfaceAlbedo;
+
+
+const vec3 DefaultSpecularReflectanceDielectric=vec3(0.04,0.04,0.04);
+
+surfaceAlbedo=mix(baseColor.rgb*(1.0-DefaultSpecularReflectanceDielectric.r),vec3(0.,0.,0.),metallicRoughness.r);
+
+surfaceReflectivityColor=mix(DefaultSpecularReflectanceDielectric,baseColor,metallicRoughness.r);
+#else
+#ifdef REFLECTIVITY
+vec4 surfaceReflectivityColorMap=texture2D(reflectivitySampler,vReflectivityUV+uvOffset);
+surfaceReflectivityColor*=toLinearSpace(surfaceReflectivityColorMap.rgb);
+surfaceReflectivityColor*=vReflectivityInfos.y;
+#ifdef MICROSURFACEFROMREFLECTIVITYMAP
+microSurface*=surfaceReflectivityColorMap.a;
+microSurface*=vReflectivityInfos.z;
+#else
+#ifdef MICROSURFACEAUTOMATIC
+microSurface*=computeDefaultMicroSurface(microSurface,surfaceReflectivityColor);
+#endif
+#ifdef MICROSURFACEMAP
+vec4 microSurfaceTexel=texture2D(microSurfaceSampler,vMicroSurfaceSamplerUV+uvOffset)*vMicroSurfaceSamplerInfos.y;
+microSurface*=microSurfaceTexel.r;
+#endif
+#endif
+#endif
+#endif
+
+microSurface=clamp(microSurface,0.,1.);
+
+float roughness=1.-microSurface;
+
+#ifdef ALPHAFRESNEL
+#if defined(ALPHATEST) || defined(ALPHABLEND)
+
+
+
+float opacityPerceptual=alpha;
+#ifdef LINEARALPHAFRESNEL
+float opacity0=opacityPerceptual;
+#else
+float opacity0=opacityPerceptual*opacityPerceptual;
+#endif
+float opacity90=fresnelGrazingReflectance(opacity0);
+vec3 normalForward=faceforward(normalW,-viewDirectionW,normalW);
+
+alpha=fresnelSchlickEnvironmentGGX(clamp(dot(viewDirectionW,normalForward),0.0,1.0),vec3(opacity0),vec3(opacity90),sqrt(microSurface)).x;
+#ifdef ALPHATEST
+if (alpha<ALPHATESTVALUE)
+discard;
+#ifndef ALPHABLEND
+
+alpha=1.0;
+#endif
+#endif
+#endif
+#endif
+
+
+float NdotVUnclamped=dot(normalW,viewDirectionW);
+float NdotV=clamp(NdotVUnclamped,0.,1.)+0.00001;
+float alphaG=convertRoughnessToAverageSlope(roughness);
+#ifdef SPECULARAA
+
+
+alphaG+=(0.75*geometricAlphaGFactor);
+#endif
+
+#ifdef REFRACTION
+vec4 environmentRefraction=vec4(0.,0.,0.,0.);
+vec3 refractionVector=refract(-viewDirectionW,normalW,vRefractionInfos.y);
+#ifdef REFRACTIONMAP_OPPOSITEZ
+refractionVector.z*=-1.0;
+#endif
+
+#ifdef REFRACTIONMAP_3D
+refractionVector.y=refractionVector.y*vRefractionInfos.w;
+vec3 refractionCoords=refractionVector;
+refractionCoords=vec3(refractionMatrix*vec4(refractionCoords,0));
+#else
+vec3 vRefractionUVW=vec3(refractionMatrix*(view*vec4(vPositionW+refractionVector*vRefractionInfos.z,1.0)));
+vec2 refractionCoords=vRefractionUVW.xy/vRefractionUVW.z;
+refractionCoords.y=1.0-refractionCoords.y;
+#endif
+#ifdef LODINREFRACTIONALPHA
+float refractionLOD=getLodFromAlphaG(vRefractionMicrosurfaceInfos.x,alphaG,NdotVUnclamped);
+#else
+float refractionLOD=getLodFromAlphaG(vRefractionMicrosurfaceInfos.x,alphaG,1.0);
+#endif
+#ifdef LODBASEDMICROSFURACE
+
+refractionLOD=refractionLOD*vRefractionMicrosurfaceInfos.y+vRefractionMicrosurfaceInfos.z;
+#ifdef LODINREFRACTIONALPHA
+float automaticRefractionLOD=UNPACK_LOD(sampleRefraction(refractionSampler,refractionCoords).a);
+float requestedRefractionLOD=max(automaticRefractionLOD,refractionLOD);
+#else
+float requestedRefractionLOD=refractionLOD;
+#endif
+environmentRefraction=sampleRefractionLod(refractionSampler,refractionCoords,requestedRefractionLOD);
+#else
+float lodRefractionNormalized=clamp(refractionLOD/log2(vRefractionMicrosurfaceInfos.x),0.,1.);
+float lodRefractionNormalizedDoubled=lodRefractionNormalized*2.0;
+vec4 environmentRefractionMid=sampleRefraction(refractionSampler,refractionCoords);
+if(lodRefractionNormalizedDoubled<1.0){
+environmentRefraction=mix(
+sampleRefraction(refractionSamplerHigh,refractionCoords),
+environmentRefractionMid,
+lodRefractionNormalizedDoubled
+);
+}else{
+environmentRefraction=mix(
+environmentRefractionMid,
+sampleRefraction(refractionSamplerLow,refractionCoords),
+lodRefractionNormalizedDoubled-1.0
+);
+}
+#endif
+#ifdef GAMMAREFRACTION
+environmentRefraction.rgb=fromRGBD(environmentRefraction);
+#endif
+#ifdef RGBDREFRACTION
+environmentRefraction.rgb=toLinearSpace(environmentRefraction.rgb);
+#endif
+
+environmentRefraction.rgb*=vRefractionInfos.x;
+#endif
+
+#ifdef REFLECTION
+vec4 environmentRadiance=vec4(0.,0.,0.,0.);
+vec3 environmentIrradiance=vec3(0.,0.,0.);
+vec3 reflectionVector=computeReflectionCoords(vec4(vPositionW,1.0),normalW);
+#ifdef REFLECTIONMAP_OPPOSITEZ
+reflectionVector.z*=-1.0;
+#endif
+
+#ifdef REFLECTIONMAP_3D
+vec3 reflectionCoords=reflectionVector;
+#else
+vec2 reflectionCoords=reflectionVector.xy;
+#ifdef REFLECTIONMAP_PROJECTION
+reflectionCoords/=reflectionVector.z;
+#endif
+reflectionCoords.y=1.0-reflectionCoords.y;
+#endif
+#if defined(LODINREFLECTIONALPHA) && !defined(REFLECTIONMAP_SKYBOX)
+float reflectionLOD=getLodFromAlphaG(vReflectionMicrosurfaceInfos.x,alphaG,NdotVUnclamped);
+#else
+float reflectionLOD=getLodFromAlphaG(vReflectionMicrosurfaceInfos.x,alphaG,1.);
+#endif
+#ifdef LODBASEDMICROSFURACE
+
+reflectionLOD=reflectionLOD*vReflectionMicrosurfaceInfos.y+vReflectionMicrosurfaceInfos.z;
+#ifdef LODINREFLECTIONALPHA
+
+
+
+
+
+
+
+
+
+float automaticReflectionLOD=UNPACK_LOD(sampleReflection(reflectionSampler,reflectionCoords).a);
+float requestedReflectionLOD=max(automaticReflectionLOD,reflectionLOD);
+#else
+float requestedReflectionLOD=reflectionLOD;
+#endif
+environmentRadiance=sampleReflectionLod(reflectionSampler,reflectionCoords,requestedReflectionLOD);
+#else
+float lodReflectionNormalized=clamp(reflectionLOD/log2(vReflectionMicrosurfaceInfos.x),0.,1.);
+float lodReflectionNormalizedDoubled=lodReflectionNormalized*2.0;
+vec4 environmentSpecularMid=sampleReflection(reflectionSampler,reflectionCoords);
+if(lodReflectionNormalizedDoubled<1.0){
+environmentRadiance=mix(
+sampleReflection(reflectionSamplerHigh,reflectionCoords),
+environmentSpecularMid,
+lodReflectionNormalizedDoubled
+);
+}else{
+environmentRadiance=mix(
+environmentSpecularMid,
+sampleReflection(reflectionSamplerLow,reflectionCoords),
+lodReflectionNormalizedDoubled-1.0
+);
+}
+#endif
+#ifdef RGBDREFLECTION
+environmentRadiance.rgb=fromRGBD(environmentRadiance);
+#endif
+#ifdef GAMMAREFLECTION
+environmentRadiance.rgb=toLinearSpace(environmentRadiance.rgb);
+#endif
+
+#ifdef USESPHERICALFROMREFLECTIONMAP
+#if defined(NORMAL) && defined(USESPHERICALINVERTEX)
+environmentIrradiance=vEnvironmentIrradiance;
+#else
+vec3 irradianceVector=vec3(reflectionMatrix*vec4(normalW,0)).xyz;
+#ifdef REFLECTIONMAP_OPPOSITEZ
+irradianceVector.z*=-1.0;
+#endif
+environmentIrradiance=environmentIrradianceJones(irradianceVector);
+#endif
+#endif
+
+environmentRadiance.rgb*=vReflectionInfos.x;
+environmentRadiance.rgb*=vReflectionColor.rgb;
+environmentIrradiance*=vReflectionColor.rgb;
+#endif
+
+
+
+float reflectance=max(max(surfaceReflectivityColor.r,surfaceReflectivityColor.g),surfaceReflectivityColor.b);
+float reflectance90=fresnelGrazingReflectance(reflectance);
+vec3 specularEnvironmentR0=surfaceReflectivityColor.rgb;
+vec3 specularEnvironmentR90=vec3(1.0,1.0,1.0)*reflectance90;
+
+vec3 diffuseBase=vec3(0.,0.,0.);
+#ifdef SPECULARTERM
+vec3 specularBase=vec3(0.,0.,0.);
+#endif
+#ifdef LIGHTMAP
+vec3 lightmapColor=texture2D(lightmapSampler,vLightmapUV+uvOffset).rgb;
+#ifdef GAMMALIGHTMAP
+lightmapColor=toLinearSpace(lightmapColor);
+#endif
+lightmapColor*=vLightmapInfos.y;
+#endif
+lightingInfo info;
+pointLightingInfo pointInfo;
+spotLightingInfo spotInfo;
+float shadow=1.; 
+float NdotL=-1.;
+#include<lightFragment>[0..maxSimultaneousLights]
+
+#if defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
+
+vec2 brdfSamplerUV=vec2(NdotV,roughness);
+
+vec4 environmentBrdf=texture2D(environmentBrdfSampler,brdfSamplerUV);
+vec3 specularEnvironmentReflectance=specularEnvironmentR0*environmentBrdf.x+environmentBrdf.y;
+#ifdef RADIANCEOCCLUSION
+#ifdef AMBIENTINGRAYSCALE
+float ambientMonochrome=ambientOcclusionColor.r;
+#else
+float ambientMonochrome=getLuminance(ambientOcclusionColor);
+#endif
+float seo=environmentRadianceOcclusion(ambientMonochrome,NdotVUnclamped);
+specularEnvironmentReflectance*=seo;
+#endif
+#ifdef HORIZONOCCLUSION
+#ifdef BUMP
+#ifdef REFLECTIONMAP_3D
+float eho=environmentHorizonOcclusion(-viewDirectionW,normalW);
+specularEnvironmentReflectance*=eho;
+#endif
+#endif
+#endif
+#else
+
+vec3 specularEnvironmentReflectance=fresnelSchlickEnvironmentGGX(NdotV,specularEnvironmentR0,specularEnvironmentR90,sqrt(microSurface));
+#endif
+
+#ifdef REFRACTION
+vec3 refractance=vec3(0.0,0.0,0.0);
+vec3 transmission=vec3(1.0,1.0,1.0);
+#ifdef LINKREFRACTIONTOTRANSPARENCY
+
+transmission*=(1.0-alpha);
+
+
+vec3 mixedAlbedo=surfaceAlbedo;
+float maxChannel=max(max(mixedAlbedo.r,mixedAlbedo.g),mixedAlbedo.b);
+vec3 tint=clamp(maxChannel*mixedAlbedo,0.0,1.0);
+
+surfaceAlbedo*=alpha;
+
+environmentIrradiance*=alpha;
+
+environmentRefraction.rgb*=tint;
+
+alpha=1.0;
+#endif
+
+vec3 bounceSpecularEnvironmentReflectance=(2.0*specularEnvironmentReflectance)/(1.0+specularEnvironmentReflectance);
+specularEnvironmentReflectance=mix(bounceSpecularEnvironmentReflectance,specularEnvironmentReflectance,alpha);
+
+transmission*=1.0-specularEnvironmentReflectance;
+
+refractance=transmission;
+#endif
+
+
+
+
+surfaceAlbedo.rgb=(1.-reflectance)*surfaceAlbedo.rgb;
+
+#ifdef REFLECTION
+vec3 finalIrradiance=environmentIrradiance;
+finalIrradiance*=surfaceAlbedo.rgb;
+#endif
+
+#ifdef SPECULARTERM
+vec3 finalSpecular=specularBase;
+finalSpecular=max(finalSpecular,0.0);
+
+vec3 finalSpecularScaled=finalSpecular*vLightingIntensity.x*vLightingIntensity.w;
+#endif
+
+#ifdef REFLECTION
+vec3 finalRadiance=environmentRadiance.rgb;
+finalRadiance*=specularEnvironmentReflectance;
+
+vec3 finalRadianceScaled=finalRadiance*vLightingIntensity.z;
+#endif
+
+#ifdef REFRACTION
+vec3 finalRefraction=environmentRefraction.rgb;
+finalRefraction*=refractance;
+#endif
+
+#ifdef ALPHABLEND
+float luminanceOverAlpha=0.0;
+#if defined(REFLECTION) && defined(RADIANCEOVERALPHA)
+luminanceOverAlpha+=getLuminance(finalRadianceScaled);
+#endif
+#if defined(SPECULARTERM) && defined(SPECULAROVERALPHA)
+luminanceOverAlpha+=getLuminance(finalSpecularScaled);
+#endif
+#if defined(RADIANCEOVERALPHA) || defined(SPECULAROVERALPHA)
+alpha=clamp(alpha+luminanceOverAlpha*luminanceOverAlpha,0.,1.);
+#endif
+#endif
+#endif
+
+vec3 finalDiffuse=diffuseBase;
+finalDiffuse.rgb+=vAmbientColor;
+finalDiffuse*=surfaceAlbedo.rgb;
+finalDiffuse=max(finalDiffuse,0.0);
+
+vec3 finalEmissive=vEmissiveColor;
+#ifdef EMISSIVE
+vec3 emissiveColorTex=texture2D(emissiveSampler,vEmissiveUV+uvOffset).rgb;
+finalEmissive*=toLinearSpace(emissiveColorTex.rgb);
+finalEmissive*=vEmissiveInfos.y;
+#endif
+
+#ifdef AMBIENT
+vec3 ambientOcclusionForDirectDiffuse=mix(vec3(1.),ambientOcclusionColor,vAmbientInfos.w);
+#else
+vec3 ambientOcclusionForDirectDiffuse=ambientOcclusionColor;
+#endif
+
+
+
+vec4 finalColor=vec4(
+finalDiffuse*ambientOcclusionForDirectDiffuse*vLightingIntensity.x +
+#ifndef UNLIT
+#ifdef REFLECTION
+finalIrradiance*ambientOcclusionColor*vLightingIntensity.z +
+#endif
+#ifdef SPECULARTERM
+
+
+finalSpecularScaled +
+#endif
+#ifdef REFLECTION
+
+
+finalRadianceScaled +
+#endif
+#ifdef REFRACTION
+finalRefraction*vLightingIntensity.z +
+#endif
+#endif
+finalEmissive*vLightingIntensity.y,
+alpha);
+
+#ifdef LIGHTMAP
+#ifndef LIGHTMAPEXCLUDED
+#ifdef USELIGHTMAPASSHADOWMAP
+finalColor.rgb*=lightmapColor;
+#else
+finalColor.rgb+=lightmapColor;
+#endif
+#endif
+#endif
+
+finalColor=max(finalColor,0.0);
+#include<logDepthFragment>
+#include<fogFragment>(color,finalColor)
+#ifdef IMAGEPROCESSINGPOSTPROCESS
+
+
+finalColor.rgb=clamp(finalColor.rgb,0.,30.0);
+#else
+
+finalColor=applyImageProcessing(finalColor);
+#endif
+#ifdef PREMULTIPLYALPHA
+
+finalColor.rgb*=finalColor.a;
+#endif
+gl_FragColor=finalColor;
+}

@@ -13,7 +13,7 @@ function AnimationMoveInChest(targetBackward, duration)
 
     var cubicBezierVectors = BABYLON.Curve3.CreateQuadraticBezier(
         object.position,
-        new BABYLON.Vector3((object.position.x + x)/2, object.position.y+10, object.position.y-10),
+        new BABYLON.Vector3((object.position.x + x)/2, object.position.y+10, object.position.z-10),
         new BABYLON.Vector3(x, targetBackward.y, z),
         60);
     var path = cubicBezierVectors.getPoints();

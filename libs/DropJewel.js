@@ -1,10 +1,10 @@
-function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
+function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationDown, speedMove) {
     var object = this;
 
     var durationPosition = 60;
     object.userData.speedMove = Math.random() * (1.5 - 1.0) + 1.0;
 
-    var animation, animationInChest, animationFreeSpin, animationScaling;
+    var animation, animationInChest, animationInChestPartMap, animationFreeSpin, animationScaling;
 
     scene.registerBeforeRender(function () {
         if (object.userData.startDrop) {
@@ -61,11 +61,22 @@ function DropJewel(scene, pushButton, positionDestinationDown, speedMove) {
                     v.position = BABYLON.Vector3.Zero();
                 }
             });
-            animationFreeSpin = AnimationFreeSpin.call(object, new BABYLON.Vector3(0, 2, 10), 30);
+            animationFreeSpin = AnimationFreeSpin.call(object, pointsFreeSpinObject, new BABYLON.Vector3(0, 2, 10), 30);
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {
                 animationFreeSpin.animationStarted = false;
-                object.userData.endInChestAnimation = true;
+                setTimeout(() => {
+                    animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(20, 20, object.position.z), 60);
+                    animationInChestPartMap.onAnimationEnd = function () {
+                        animationInChestPartMap.animationStarted = false;
+                        object.userData.endInChestAnimation = true;
+                    }
+                }, 1000);
+                /*animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60);
+                animationInChestPartMap.onAnimationEnd = function () {
+                    animationInChestPartMap.animationStarted = false;
+
+                }*/
             }
         }
     });

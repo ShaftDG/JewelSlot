@@ -7,17 +7,18 @@ function TextLabel(position, scene, duration, parametres) {
     this.previousText = null;
     this.duration = duration;
     this.anchor = new BABYLON.TransformNode("");
+    this.anchor.position = position;
 }
 
 TextLabel.prototype.constructor = TextLabel;
 
 TextLabel.prototype.addPlanesSymbols = function (countSymbols) {
-    var posX = (((countSymbols-1) * this.distanceBetweenSymbol)/2) + this.position.x;
+    var posX = (((countSymbols-1) * this.distanceBetweenSymbol)/2) /*+ this.position.x*/;
     for (var i = 0; i < countSymbols; i++) {
         var symb = new OneSymbolLabel(this.scene, this.duration, this.parametres);
         symb.plane.parent = this.anchor;
-        symb.plane.position.y = this.position.y;
-        symb.plane.position.z = this.position.z;
+      //  symb.plane.position.y = this.position.y;
+      //  symb.plane.position.z = this.position.z;
         symb.plane.position.x = posX - i * this.distanceBetweenSymbol;
         this.arrayPlaneSymbols.push(symb);
     }
@@ -35,13 +36,13 @@ TextLabel.prototype.setText = function (text) {
     var arrayText = Array.from(text.toString());
     if (arrayText.length > this.arrayPlaneSymbols.length) {
         this.addPlanesSymbols(arrayText.length-this.arrayPlaneSymbols.length);
-        var posX = (((arrayText.length-1) * this.distanceBetweenSymbol)/2) + this.position.x;
+        var posX = (((arrayText.length-1) * this.distanceBetweenSymbol)/2) /*+ this.position.x*/;
         this.arrayPlaneSymbols.map((value, index) => {
             value.plane.position.x = posX - index * this.distanceBetweenSymbol;
         });
     } else if (arrayText.length < this.arrayPlaneSymbols.length) {
         this.deletePlanesSymbols(arrayText.length);
-        var posX = (((arrayText.length-1) * this.distanceBetweenSymbol)/2) + this.position.x;
+        var posX = (((arrayText.length-1) * this.distanceBetweenSymbol)/2) /*+ this.position.x*/;
         this.arrayPlaneSymbols.map((value, index) => {
             value.plane.position.x = posX - index * this.distanceBetweenSymbol;
         });
@@ -70,13 +71,13 @@ TextLabel.prototype.setTextForAnimation = function (text) {
             var arrayText = Array.from(text.toString());
             if (arrayText.length > this.arrayPlaneSymbols.length) {
                 this.addPlanesSymbols(arrayText.length - this.arrayPlaneSymbols.length);
-                var posX = (((arrayText.length - 1) * this.distanceBetweenSymbol) / 2) + this.position.x;
+                var posX = (((arrayText.length - 1) * this.distanceBetweenSymbol) / 2) /*+ this.position.x*/;
                 this.arrayPlaneSymbols.map((value, index) => {
                     value.plane.position.x = posX - index * this.distanceBetweenSymbol;
                 });
             } else if (arrayText.length < this.arrayPlaneSymbols.length) {
                 this.deletePlanesSymbols(arrayText.length);
-                var posX = (((arrayText.length - 1) * this.distanceBetweenSymbol) / 2) + this.position.x;
+                var posX = (((arrayText.length - 1) * this.distanceBetweenSymbol) / 2) /*+ this.position.x*/;
                 this.arrayPlaneSymbols.map((value, index) => {
                     value.plane.position.x = posX - index * this.distanceBetweenSymbol;
                 });
