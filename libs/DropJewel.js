@@ -66,12 +66,12 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
             animationFreeSpin.onAnimationEnd = function () {
                 animationFreeSpin.animationStarted = false;
                 setTimeout(() => {
-                    animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(20, 20, object.position.z), 60);
+                    animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(20, 20, object.position.z+20), 60);
                     animationInChestPartMap.onAnimationEnd = function () {
                         animationInChestPartMap.animationStarted = false;
                         object.userData.endInChestAnimation = true;
                     }
-                }, 1000);
+                }, 700);
                 /*animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60);
                 animationInChestPartMap.onAnimationEnd = function () {
                     animationInChestPartMap.animationStarted = false;

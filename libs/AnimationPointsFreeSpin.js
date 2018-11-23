@@ -1,7 +1,8 @@
-function AnimationPointsFreeSpin(targetBackward, duration)
+function AnimationPointsFreeSpin(pointsFreeSpinObject, duration)
 {
     var object = this;
 
+    var targetBackward = pointsFreeSpinObject.freeSpin.anchor.position.clone();
     //Create a Vector3 animationBackward at 30 FPS
     var animationBackward = new BABYLON.Animation("animationBackward", "position", 1.5, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 
@@ -12,7 +13,7 @@ function AnimationPointsFreeSpin(targetBackward, duration)
 
     var cubicBezierVectors = BABYLON.Curve3.CreateQuadraticBezier(
         object.position,
-        new BABYLON.Vector3((object.position.x + x)/2, object.position.y-10, object.position.z+20),
+        new BABYLON.Vector3((object.position.x + x)/2, object.position.y-5, object.position.z+30),
         targetBackward,
         60);
     var path = cubicBezierVectors.getPoints();
@@ -71,6 +72,8 @@ function AnimationPointsFreeSpin(targetBackward, duration)
 
     var eventSetVisible = new BABYLON.AnimationEvent(60, function() {
         object.visibility = false;
+        pointsFreeSpinObject.freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+        pointsFreeSpinObject.box.userData.particles.stop();
     }, true);
     // Attach your event to your animation
     animationBackward.addEvent(eventSetVisible);

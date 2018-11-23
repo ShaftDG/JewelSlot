@@ -162,15 +162,22 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
 
     var eventFireBall = new BABYLON.AnimationEvent(70, function() {
         pointsFreeSpinObject.box.visibility = true;
-        var animation = AnimationPointsFreeSpin.call(pointsFreeSpinObject.box, pointsFreeSpinObject.freeSpin.anchor.position.clone(), 30);
+        var animation = AnimationPointsFreeSpin.call(pointsFreeSpinObject.box, pointsFreeSpinObject, 40);
+        pointsFreeSpinObject.box.userData.particles.start();
         animation.onAnimationEnd = function () {
             animation.animationStarted = false;
             pointsFreeSpinObject.box.position = pointsFreeSpinObject.box.userData.beginPosition;
+           // pointsFreeSpinObject.freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
         };
-        Combustion.call(partMap);
     }, true);
 // Attach your event to your animation
     animationEmissive.addEvent(eventFireBall);
+
+    var eventCombustion = new BABYLON.AnimationEvent(72, function() {
+        Combustion.call(partMap);
+    }, true);
+// Attach your event to your animation
+    animationEmissive.addEvent(eventCombustion);
 
     scene.beginAnimation(partMap, 0, 80, false, duration);
 

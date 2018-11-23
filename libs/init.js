@@ -52,11 +52,10 @@ if (BABYLON.Engine.isSupported()) {
         var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
         hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
         texturesJewel = [...texturesJewel, hdrTexture];
-        var textureMapAlbedo = new BABYLON.Texture("models/PirateTreasureMapScroll_diffuse.jpg", scene);
-        var textureMapEmissive = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
-        /*textureMap.uOffset = -1.0;
-        textureMap.vOffset = 1.0;*/
-        texturesJewel = [...texturesJewel, textureMapAlbedo];
+        var textureMapNoise = new BABYLON.Texture("textures/noiseCombustion.png", scene);
+        texturesJewel = [...texturesJewel, textureMapNoise];
+        var textureMapGradient = new BABYLON.Texture("textures/Fractal_fire.jpg", scene);
+        texturesJewel = [...texturesJewel, textureMapGradient];
     /*    var emissiveTextureMap = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
         texturesJewel = [...texturesJewel, emissiveTextureMap];*/
 
@@ -485,12 +484,15 @@ if (BABYLON.Engine.isSupported()) {
                /* newMeshes[0]._children.map(v => {
                     console.log(v.name);
                 });*/
-                var box = BABYLON.Mesh.CreateBox("box", 2.0, scene);
+                var box = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.1}, scene);
                 box.visibility = false;
                 box.position = new BABYLON.Vector3(-0.75, 4.2, 9.0);
+                var fireBall = FireBall(box);
                 box.userData = {
-                    beginPosition: box.position.clone()
+                    beginPosition: box.position.clone(),
+                    particles: fireBall
                 };
+
 
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
@@ -649,7 +651,7 @@ if (BABYLON.Engine.isSupported()) {
                                 roundScore.zeroing();
                                 genCombination.gettingWinnings();
                                 credit.setTextForAnimation(genCombination.totalScore);
-                                freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+                              //  freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
                             }
                         }
                     }
@@ -657,7 +659,7 @@ if (BABYLON.Engine.isSupported()) {
                         endScaling = false;
                         moveFreeSpin = true;
                         countSymbolScaling = 15;
-                        freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+                     //   freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
                 }
             });
             scene.registerAfterRender(function () {

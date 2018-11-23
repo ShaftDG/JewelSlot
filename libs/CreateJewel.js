@@ -101,7 +101,9 @@ function CreateJewel(renderList, textures, position, isMobile)
             };
             v.userData = {
                 center: center,
-                defaultMaterial: v.material
+                defaultMaterial: v.material,
+                noiseTexture: textures[1],
+                gradientTexture: textures[2]
             };
         } else {
             v.particleSystem = FireParticles(v);
