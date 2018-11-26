@@ -98,6 +98,7 @@ function CreateJewel(renderList, textures, position, isMobile)
             v.particleSystem = {
                 electric: ElectricField(v),
                 spark: StarBackground(v),
+                fire: FireParticles(v, {sizeParticle: 7, countParticles: 10}),
             };
             v.userData = {
                 center: center,

@@ -175,6 +175,9 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
 
     var eventCombustion = new BABYLON.AnimationEvent(72, function() {
         Combustion.call(partMap);
+        if (partMap.particleSystem.electric) {
+            partMap.particleSystem.fire.start();
+        }
     }, true);
 // Attach your event to your animation
     animationEmissive.addEvent(eventCombustion);

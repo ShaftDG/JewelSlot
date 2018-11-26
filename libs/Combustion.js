@@ -25,41 +25,51 @@ function Combustion() {
      /*before gl_position use positionUpdate */ 
         vec3 totalColor = vec3(1.0);
         vec3 combustionColor = vec3(0.0);
-        vec3 coalColor = vec3(0.0);
+        vec3 fireColor = vec3(0.0);
+        vec3 coalColor = vec3(1.0);
         #ifdef ALBEDO
         vec2 uv2 = vAlbedoUV+uvOffset;
             float upFactor = 0.659;
             float scaleFactorX = 2.0;
             float scaleFactorY = 3.0;
-            float rateFactor = time*0.164;
+            float rateFactor = time*0.25;
             float speedFactor = cos(sin(rateFactor*2.0)*2.0);
             float hotFactor = 0.1;
             vec4 noiseTex = texture2D(customNoiseSampler,uv2); 
-            vec3 combustionTexture = noiseTex.rgb + rateFactor;
-        
-            combustionColor = texture2D(gradientFireSampler,vec2( clamp( combustionTexture.r, 0.0, 1.0 ) )).rgb; 
-           
-       float cutEdge = texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).r;
-       if (cutEdge < 0.45) {
-            combustionColor*=texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).r*hotFactor*clamp(sin(rateFactor*50.0)*10.0, 1.0, 5.0);           
-       }
+            vec3 combustionTexture = noiseTex.rgb + rateFactor;            
+            
+            if ( combustionTexture.r > 0.5 ) {
+                fireColor = texture2D( gradientFireSampler,vec2(combustionTexture.r*4.5) ).rgb;
+            }  
+            
+            
+         if (combustionTexture.r < upFactor+0.1 && combustionTexture.r > upFactor-0.07) {
+            combustionColor = texture2D(gradientFireSampler,vec2( combustionTexture.r*5.53 )).rgb; 
+            
+            float cutEdge = texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).g+ rateFactor;
+            if (cutEdge < 0.45) {
+                combustionColor*=texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).g*hotFactor*clamp(sin(rateFactor*50.0)*10.0, 1.0, 5.0);           
+            }
        
-       if (cutEdge >= 0.75) {
-            combustionColor*=(vec3(1.1, 1.75, 1.1)+texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).r)*clamp(sin(rateFactor*50.0), 0.0, 2.0);           
-       }
-   
+            if (cutEdge >= 0.75) {
+                combustionColor*=(vec3(1.1, 1.75, 1.1)+texture2D(customNoiseSampler,vec2(uv2.x*scaleFactorX, uv2.y*scaleFactorY+speedFactor)).g)*clamp(sin(rateFactor*50.0), 0.0, 2.0);           
+            }
+       
             combustionColor*=toLinearSpace(combustionColor);
-            combustionColor*=vLightingIntensity.y;
-   
-            coalColor = vec3(1.0-texture2D(gradientFireSampler,vec2(clamp( (combustionTexture.r)*1.02, 0.0, 1.0) )).r)+0.05;           
-     
+            combustionColor*=vLightingIntensity.y; 
+            
+            coalColor = vec3(1.0-texture2D(gradientFireSampler,vec2( combustionTexture.r*5.6 )).r)+0.05;   
+        }       
+           
         vec4 blended = finalColor * vec4(coalColor, 1.0)+vec4(combustionColor, 1.0);
+        
         if ( combustionTexture.r > upFactor || (uv2.x > 0.5 && uv2.y > 0.2 && uv2.y < 0.8) ) {
             discard;            
         }
         #endif             
       
-        gl_FragColor=blended;
+       gl_FragColor=max(blended, vec4(0.0));
+        // gl_FragColor=vec4(fireColor, 1.0);
      `);
 
     var combustionMaterial = new BABYLON.CustomPBRMaterial("coal", scene);
@@ -94,7 +104,7 @@ function Combustion() {
    combustionMaterial.backFaceCulling = false;
   // combustionMaterial._activeEffect.;
 
-    var time = 0;
+    var time = -0.5;
     var order = 0.0;
     var start_time = Date.now();
 

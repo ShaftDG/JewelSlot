@@ -184,7 +184,7 @@ GenerateWinCombination.prototype.generate = function() {
         this.stopPositionArray[j] = stopPosition;
         for (var i = 0; i < this.numPlayingSymbPerCilinder; i++ ) {
            this.arrayCombination[j][i] = this.r[j][(stopPosition > 0) ? stopPosition + i - 1 : (i > 0) ? stopPosition + i - 1 : this.r[0].length - 1 ];
-           // this.arrayCombination[j][i] = 0;
+           // this.arrayCombination[j][i] = 3;
            if (this.arrayCombination[j][i] == this.freeSpinSymb) {
                this.moveArrayFreeSpinSymb[j][i] = 1;
                this.numFreeSpinSymb++;
