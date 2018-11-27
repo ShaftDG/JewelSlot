@@ -153,8 +153,10 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
             partMap.particleSystem.electric.reset();
             partMap.particleSystem.electric.stop();
         } else {
-            partMap.particleSystem.reset();
-            partMap.particleSystem.stop();
+            partMap.particleSystem.flame.reset();
+            partMap.particleSystem.flame.stop();
+            partMap.particleSystem.origin.reset();
+            partMap.particleSystem.origin.stop();
         }
     }, true);
 // Attach your event to your animation
@@ -176,7 +178,8 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
     var eventCombustion = new BABYLON.AnimationEvent(72, function() {
         Combustion.call(partMap);
         if (partMap.particleSystem.electric) {
-            partMap.particleSystem.fire.start();
+            partMap.particleSystem.fire.flame.start();
+            partMap.particleSystem.fire.origin.start();
         }
     }, true);
 // Attach your event to your animation

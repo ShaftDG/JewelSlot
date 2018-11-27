@@ -1,7 +1,7 @@
-function FireParticles(emitter, inOptions) {
+function FireParticlesCombustion(emitter, inOptions) {
     var options = inOptions || {
-      sizeParticle: 4.5,
-      countParticles: 20
+        sizeParticle: 4.5,
+        countParticles: 24
     };
     var particleSystemFire = new BABYLON.ParticleSystem("particles", 100, scene, null, true);
 
@@ -15,14 +15,14 @@ function FireParticles(emitter, inOptions) {
     var fireEmitter = new BABYLON.TransformNode("");
     fireEmitter.parent = emitter;
     fireEmitter.position.y -= 0.5;
-    fireEmitter.position.z += 0.5;
+    fireEmitter.position.z += 0.25;
     //fireEmitter.position.z += 2.0;
     particleSystemFire.emitter = fireEmitter; // the starting object, the emitter
     // var emitterType = new BABYLON.SphereParticleEmitter();
     // emitterType.radius = 2.25;
     // particleSystemFire.particleEmitterType = emitterType;
 
-    particleSystemFire.createCylinderEmitter(1.8,2.5,0,0);
+    particleSystemFire.createBoxEmitter(new BABYLON.Vector3(0, 0.5, 0.25), new BABYLON.Vector3(0, 0.5, -0.25), new BABYLON.Vector3(-1.75, -1.75, -0.5), new BABYLON.Vector3(1.75, 1.75, 0.5));
 
     particleSystemFire.startSpriteCellID = 0;
     particleSystemFire.endSpriteCellID = 31;
@@ -35,13 +35,13 @@ function FireParticles(emitter, inOptions) {
     particleSystemFire.maxScaleX = 1.0;
     particleSystemFire.maxScaleY = 1.75;
 
-  /*  particleSystemFire.addSizeGradient(0, 3.0, 3.0);
-    particleSystemFire.addSizeGradient(0.2, 2.5, 2.5);
-    particleSystemFire.addSizeGradient(0.4, 2.0, 2.0);
-    particleSystemFire.addSizeGradient(0.6, 1.5, 1.5);
-    particleSystemFire.addSizeGradient(0.8, 1.0, 1.0);
-    particleSystemFire.addSizeGradient(1.0, 0.5, 0.5);
-    particleSystemFire.addSizeGradient(1.2, 0.0, 0.0);*/
+    /*  particleSystemFire.addSizeGradient(0, 3.0, 3.0);
+      particleSystemFire.addSizeGradient(0.2, 2.5, 2.5);
+      particleSystemFire.addSizeGradient(0.4, 2.0, 2.0);
+      particleSystemFire.addSizeGradient(0.6, 1.5, 1.5);
+      particleSystemFire.addSizeGradient(0.8, 1.0, 1.0);
+      particleSystemFire.addSizeGradient(1.0, 0.5, 0.5);
+      particleSystemFire.addSizeGradient(1.2, 0.0, 0.0);*/
     particleSystemFire.addSizeGradient(0, 0.0, 0.0);
     particleSystemFire.addSizeGradient(0.1, options.sizeParticle, options.sizeParticle / 2);
     particleSystemFire.addSizeGradient(0.08, options.sizeParticle * 0.72, (options.sizeParticle * 0.72)/2);
@@ -106,21 +106,21 @@ function FireParticles(emitter, inOptions) {
     // particleSystemFire.renderingGroupId = 1;
     // particleSystemFire.isBillboardBased = false;
     //change start position function
-  /*  var walkPS = 0;
-    var meshModelVertices = emitter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-    particleSystemFire.startPositionFunction = function (worldMatrix, positionToUpdate, particle) {
+    /*  var walkPS = 0;
+      var meshModelVertices = emitter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+      particleSystemFire.startPositionFunction = function (worldMatrix, positionToUpdate, particle) {
 
-        var randX = meshModelVertices[walkPS]*0.8;
-        var randY = meshModelVertices[walkPS + 1]*0.9;
-        var randZ = meshModelVertices[walkPS + 2]*1.05;
+          var randX = meshModelVertices[walkPS]*0.8;
+          var randY = meshModelVertices[walkPS + 1]*0.9;
+          var randZ = meshModelVertices[walkPS + 2]*1.05;
 
-        BABYLON.Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
+          BABYLON.Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 
-        walkPS += 3;
-        if (walkPS > meshModelVertices.length) {
-            walkPS = 0;
-        }
-    };*/
+          walkPS += 3;
+          if (walkPS > meshModelVertices.length) {
+              walkPS = 0;
+          }
+      };*/
 
 ////////////////////////
     var particleSystemFireOrigin = new BABYLON.ParticleSystem("particles", 100, scene, null, true);
@@ -134,15 +134,15 @@ function FireParticles(emitter, inOptions) {
     // Where the particles come from
     var fireEmitter = new BABYLON.TransformNode("");
     fireEmitter.parent = emitter;
-    fireEmitter.position.y -= 2.3;
-    fireEmitter.position.z += 0.7;
+    fireEmitter.position.y -= 0.5;
+    fireEmitter.position.z += 0.25;
     //fireEmitter.position.z += 2.0;
     particleSystemFireOrigin.emitter = fireEmitter; // the starting object, the emitter
     // var emitterType = new BABYLON.SphereParticleEmitter();
     // emitterType.radius = 2.25;
     // particleSystemFireOrigin.particleEmitterType = emitterType;
 
-    particleSystemFireOrigin.createCylinderEmitter(1.4,0.1,0,0);
+    particleSystemFireOrigin.createBoxEmitter(new BABYLON.Vector3(0, 0.5, 0.25), new BABYLON.Vector3(0, 0.5, -0.25), new BABYLON.Vector3(-1.75, -1.75, -0.5), new BABYLON.Vector3(1.75, 1.75, 0.5));
 
     particleSystemFireOrigin.startSpriteCellID = 0;
     particleSystemFireOrigin.endSpriteCellID = 31;
@@ -206,7 +206,7 @@ function FireParticles(emitter, inOptions) {
     // particleSystemFireOrigin.addColorRemapGradient(1.0, 0.95, 1.0);
 
     // Emission rate
-    particleSystemFireOrigin.emitRate = options.countParticles/2;
+    particleSystemFireOrigin.emitRate = (options.countParticles/2) + 2;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
     particleSystemFireOrigin.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
@@ -222,7 +222,7 @@ function FireParticles(emitter, inOptions) {
     particleSystemFireOrigin.minEmitPower = 0;
     particleSystemFireOrigin.maxEmitPower = 0;
     particleSystemFireOrigin.updateSpeed = 0.04;
-    particleSystemFireOrigin.targetStopDuration = 2.5;
+    particleSystemFireOrigin.targetStopDuration = 0.4;
 
     return {flame: particleSystemFire, origin: particleSystemFireOrigin};
 }

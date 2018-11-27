@@ -173,8 +173,10 @@ if (BABYLON.Engine.isSupported()) {
                             v.particleSystem.spark.reset();
                             v.particleSystem.spark.stop();
                         } else {
-                            v.particleSystem.reset();
-                            v.particleSystem.stop();
+                            v.particleSystem.flame.reset();
+                            v.particleSystem.flame.stop();
+                            v.particleSystem.origin.reset();
+                            v.particleSystem.origin.stop();
                         }
 
                         v.scaling = new BABYLON.Vector3(1,1,1);
@@ -292,6 +294,18 @@ if (BABYLON.Engine.isSupported()) {
         var winLines = WinLines(optionsWinLines, scene);
         var rightCheckWinLines, leftCheckWinLines;
         Promise.all([
+            BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
+                newMeshes[0].name = "compass";
+                newMeshes[0].position = freeSpin.anchor.position.clone();
+                newMeshes[0].position.z -= 1.0;
+                newMeshes[0]._children.map(v => {
+                    v.material.reflectionTexture = hdrTexture;
+                });
+              //  newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
+                OpenChest.call(newMeshes[2], new BABYLON.Vector3(0,Math.PI*0.4,0), 15);
+                OpenChest.call(newMeshes[1], new BABYLON.Vector3(0,0,Math.PI*10), 15);
+
+            }),
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
             rightCheckWinLines = newMeshes[1];
             rightCheckWinLines._children.map(v => {

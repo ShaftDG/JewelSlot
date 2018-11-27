@@ -24,14 +24,14 @@ function ElectricField(emitter) {
 
     // Size of each particle (random between...
     particleSystem.minSize = 0.5;
-    particleSystem.maxSize = 2.0;
+    particleSystem.maxSize = 3.0;
 
     // Life time of each particle (random between...
     particleSystem.minLifeTime = 0.1;
     particleSystem.maxLifeTime = 0.4;
 
     // Emission rate
-    particleSystem.emitRate = 500;
+    particleSystem.emitRate = 250;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
     particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;

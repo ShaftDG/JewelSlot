@@ -70,7 +70,8 @@ function AnimationMoveForward(targetForward, duration)
                 if (v.particleSystem.electric) {
                     v.particleSystem.electric.start();
                 } else {
-                    v.particleSystem.start();
+                    v.particleSystem.flame.start();
+                    v.particleSystem.origin.start();
                 }
             }
         });
@@ -84,8 +85,10 @@ function AnimationMoveForward(targetForward, duration)
                 v.particleSystem.electric.reset();
                 v.particleSystem.electric.stop();
             } else {
-                v.particleSystem.reset();
-                v.particleSystem.stop();
+                v.particleSystem.flame.reset();
+                v.particleSystem.flame.stop();
+                v.particleSystem.origin.reset();
+                v.particleSystem.origin.stop();
             }
         });
     }, true);
