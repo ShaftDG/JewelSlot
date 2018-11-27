@@ -73,6 +73,10 @@ function AnimationPointsFreeSpin(pointsFreeSpinObject, duration)
     var eventSetVisible = new BABYLON.AnimationEvent(60, function() {
         object.visibility = false;
         pointsFreeSpinObject.freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+
+        pointsFreeSpinObject.freeSpin.compass.rotation = BABYLON.Vector3.Zero();
+        OpenChest.call(pointsFreeSpinObject.freeSpin.compass, new BABYLON.Vector3(0,0,Math.PI*10), 15);
+
         pointsFreeSpinObject.box.userData.particles.stop();
     }, true);
     // Attach your event to your animation

@@ -301,6 +301,7 @@ if (BABYLON.Engine.isSupported()) {
                 newMeshes[0]._children.map(v => {
                     v.material.reflectionTexture = hdrTexture;
                 });
+                freeSpin.compass = newMeshes[1];
               //  newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
                 OpenChest.call(newMeshes[2], new BABYLON.Vector3(0,Math.PI*0.4,0), 15);
                 OpenChest.call(newMeshes[1], new BABYLON.Vector3(0,0,Math.PI*10), 15);
