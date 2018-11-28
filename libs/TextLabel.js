@@ -104,3 +104,9 @@ TextLabel.prototype.zeroing = function () {
         value.setEnabled(false);
     });
 };
+
+TextLabel.prototype.setOnOff = function (val) {
+    this.arrayPlaneSymbols.map(value => {
+        value.setEnabled(val);
+    });
+};

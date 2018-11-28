@@ -70,12 +70,23 @@ function AnimationPointsFreeSpin(pointsFreeSpinObject, duration)
     object.animations.push(animationBackward);
     object.animations.push(animationRotation);
 
+
+    var eventSetOpenCompass = new BABYLON.AnimationEvent(0, function() {
+
+        pointsFreeSpinObject.freeSpin.compass.arrow.rotation = BABYLON.Vector3.Zero();
+        OpenChest.call(pointsFreeSpinObject.freeSpin.compass.cup, new BABYLON.Vector3(0,Math.PI*0.4,0), 30);
+
+    }, true);
+    // Attach your event to your animation
+    animationBackward.addEvent(eventSetOpenCompass);
+
     var eventSetVisible = new BABYLON.AnimationEvent(60, function() {
         object.visibility = false;
         pointsFreeSpinObject.freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+        pointsFreeSpinObject.freeSpin.setOnOff(true);
 
-        pointsFreeSpinObject.freeSpin.compass.rotation = BABYLON.Vector3.Zero();
-        OpenChest.call(pointsFreeSpinObject.freeSpin.compass, new BABYLON.Vector3(0,0,Math.PI*10), 15);
+        pointsFreeSpinObject.freeSpin.compass.arrow.rotation = BABYLON.Vector3.Zero();
+        OpenChest.call(pointsFreeSpinObject.freeSpin.compass.arrow, new BABYLON.Vector3(0,0,Math.PI*6), 15);
 
         pointsFreeSpinObject.box.userData.particles.stop();
     }, true);

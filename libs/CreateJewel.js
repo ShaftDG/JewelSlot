@@ -120,6 +120,7 @@ function CreateJewel(renderList, textures, position, isMobile)
         }
     });
     this.userData = {
+        beginGame: true,
         speedMove: null,
         rotateDestination: null,
         // flagDestination: false,

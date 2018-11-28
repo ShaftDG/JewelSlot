@@ -64,7 +64,8 @@ if (BABYLON.Engine.isSupported()) {
         var bet = new TextLabel( new BABYLON.Vector3(-0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
         var lines = new TextLabel( new BABYLON.Vector3(1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
 
-        var freeSpin = new TextLabel( new BABYLON.Vector3(-25, 0, 0), scene, 300, {height:0.35*8, width: 0.4*8});
+        var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.35*8, width: 0.4*8});
+        freeSpin.setOnOff(false);
 
         var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
         scene.showFps();
@@ -144,10 +145,13 @@ if (BABYLON.Engine.isSupported()) {
         var countRow = 3;
         var countColl = 5;
         function startRoundGame() {
-
             mapLineWin.clear();
             arrayObjectsFreeSpin = [];
             genCombination.generate();
+            if (genCombination.numFreeSpin <= 0) {
+                freeSpin.setOnOff(false);
+                OpenChest.call(freeSpin.compass.cup, new BABYLON.Vector3(0,0,0), 30);
+            }
             countSymbolWin = 0;
             countSymbolScaling = 0;
             for (var i = 0; i < countRow; i++) {
@@ -288,7 +292,7 @@ if (BABYLON.Engine.isSupported()) {
             distanceBetweenSymbolColl: distanceBetweenSymbolColl,
             halfLengthRow: halfLengthRow,
             halfLengthColl: halfLengthColl,
-            deltaBeginEnd: 7,
+            deltaBeginEnd: 4,
             z: -0.75
         };
         var winLines = WinLines(optionsWinLines, scene);
@@ -300,11 +304,12 @@ if (BABYLON.Engine.isSupported()) {
                 newMeshes[0].position.z -= 1.0;
                 newMeshes[0]._children.map(v => {
                     v.material.reflectionTexture = hdrTexture;
+                    v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                 });
-                freeSpin.compass = newMeshes[1];
+                freeSpin.compass = {arrow: newMeshes[1], cup: newMeshes[2]};
               //  newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
-                OpenChest.call(newMeshes[2], new BABYLON.Vector3(0,Math.PI*0.4,0), 15);
-                OpenChest.call(newMeshes[1], new BABYLON.Vector3(0,0,Math.PI*10), 15);
+              //  OpenChest.call(newMeshes[2], new BABYLON.Vector3(0,Math.PI*0.4,0), 15);
+              //  OpenChest.call(newMeshes[1], new BABYLON.Vector3(0,0,Math.PI*10), 15);
 
             }),
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
@@ -320,7 +325,7 @@ if (BABYLON.Engine.isSupported()) {
 
             newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
             newMeshes[0].name = "rightlines";
-            newMeshes[0].position.x = -20;
+            newMeshes[0].position.x = -17;
             newMeshes[0].position.y = 7.68;
             newMeshes[0].position.z = -0.75;
 

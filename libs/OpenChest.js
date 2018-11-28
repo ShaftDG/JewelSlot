@@ -22,6 +22,7 @@ function OpenChest(targetRotation, duration)
         animationRotation.setEasingFunction(easingFunction);
 //////////////////////////////////////////////
         // Adding animation to my object animations collection
+        object.animations = [];
         object.animations.push(animationRotation);
 
         //Finally, launch animations on object, from key 0 to key 120 with loop activated
