@@ -7,7 +7,7 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
     var animation, animationInChest, animationInChestPartMap, animationFreeSpin, animationScaling;
 
     scene.registerBeforeRender(function () {
-        if (object.userData.beginGame) {
+       /* if (object.userData.beginGame) {
             if (!object.userData.flagStartTween) {
                 animation = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
                 object.userData.beginGame = false;
@@ -33,7 +33,7 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
                     }
                 }
             }
-        } else if (object.userData.startDrop) {
+        } else */if (object.userData.startDrop) {
                 if (!object.userData.flagStartTween) {
                     animation = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
                     object.userData.flagStartTween = true;
@@ -96,6 +96,7 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
             animationFreeSpin = AnimationFreeSpin.call(object, pointsFreeSpinObject, new BABYLON.Vector3(0, 2, 10), 30);
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {
+                startAnimationCharacter = true;
                 animationFreeSpin.animationStarted = false;
                 setTimeout(() => {
                     animationInChestPartMap = AnimationMoveInChestPartMap.call(object, new BABYLON.Vector3(20, 20, object.position.z+20), 60);

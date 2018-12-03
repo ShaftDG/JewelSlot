@@ -9,6 +9,7 @@ if (BABYLON.Engine.isSupported()) {
     var endDrop = false;
     var dropInChest = false;
     var moveFreeSpin = false;
+    var startAnimationCharacter = false;
     var numberPartMap = 0;
     var mapLineWin = new Map();
     var mapAllSymbol = new Map();
@@ -297,7 +298,42 @@ if (BABYLON.Engine.isSupported()) {
         };
         var winLines = WinLines(optionsWinLines, scene);
         var rightCheckWinLines, leftCheckWinLines;
+
+        var animationGroupPirate = {};
+        var currentGroup;
+        // scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
+        // scene.animationPropertiesOverride.enableBlending = true;
+        // scene.animationPropertiesOverride.blendingSpeed = 0.05;
+
+        BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
+            if (plugin.name === "gltf" && plugin instanceof BABYLON.GLTFFileLoader) {
+                plugin.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE;
+                plugin.compileMaterials = true;
+                plugin.compileShadowGenerators = true;
+            }
+        });
+
         Promise.all([
+            BABYLON.SceneLoader.ImportMesh("", "models/anim/", "anim.gltf", scene, function (newMeshes, particleSystems, skeletons) {
+                newMeshes[0].name = "anim";
+                newMeshes[0].position.x = 30.0;
+                newMeshes[0].position.y = -9.0;
+                newMeshes[0].position.z = -12.0;
+
+                newMeshes[0].rotation.y = -0.5;
+             /*   scene.animationGroups[0].start(true);
+                currentGroup = scene.animationGroups[0];*/
+                var overrides = new BABYLON.AnimationPropertiesOverride();
+
+                overrides.enableBlending = true;
+                overrides.blendingSpeed = 0.05;
+                overrides.loopMode = 0;
+
+                skeletons[0].animationPropertiesOverride = overrides;
+
+                scene.animationGroups[0].start(true);
+                currentGroup = scene.animationGroups[0];
+            }),
             BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
                 newMeshes[0].position = freeSpin.anchor.position.clone();
@@ -451,6 +487,13 @@ if (BABYLON.Engine.isSupported()) {
                 leftCheckWinLines._children.map(v => {
                     v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                 });
+              /*  if (animationGroupPirate.idleBegin) {
+                    if (currentGroup) {
+                        currentGroup.stop();
+                    }
+                    animationGroupPirate.idleBegin.start(true, animationGroupPirate.idleBegin.speedRatio, animationGroupPirate.idleBegin.from, animationGroupPirate.idleBegin.to);
+                    currentGroup = animationGroupPirate.idleBegin;
+                }*/
             });
 
             var optionSecondButton = {
@@ -611,6 +654,12 @@ if (BABYLON.Engine.isSupported()) {
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 lines.setTextForAnimation(genCombination.winLineNum.toString());
                 freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+
+                scene.animationGroups.map(v => {
+                    animationGroupPirate[v.name] = v;
+                    animationGroupPirate[v.name].freeAnimation = true;
+                });
+                console.log(scene.animationGroups);
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -658,6 +707,14 @@ if (BABYLON.Engine.isSupported()) {
                                 }
                             });
                             mapObjs.moveForward = false;
+
+                            if (animationGroupPirate.idleWin && animationGroupPirate.idleLookInChest.freeAnimation) {
+                                if (currentGroup) {
+                                    currentGroup.stop();
+                                }
+                                animationGroupPirate.idleWin.start(true);
+                                currentGroup = animationGroupPirate.idleWin;
+                            }
                         } else if (mapObjs.moveBack) {
                             mapLineWin.delete(indexLine);
                             unEnableColorCheckLine(objCheckLine);
@@ -668,10 +725,37 @@ if (BABYLON.Engine.isSupported()) {
                                 endScaling = false;
                                 dropInChest = true;
                                 moveFreeSpin = true;
+                                var totalRound = genCombination.getTotalRound();
                                 roundScore.zeroing();
                                 genCombination.gettingWinnings();
                                 credit.setTextForAnimation(genCombination.totalScore);
-                              //  freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+
+
+                                if (animationGroupPirate.idleLookInChest && totalRound >= 500) {
+                                    if (currentGroup) {
+                                        currentGroup.stop();
+                                    }
+                                    animationGroupPirate.idleLookInChest.start(false);
+                                    animationGroupPirate.idleLookInChest.freeAnimation = false;
+                                    currentGroup = animationGroupPirate.idleLookInChest;
+                                    var obs = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
+                                       animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs);
+                                       setTimeout( () => {
+                                           animationGroupPirate.idleLookInChest.start(false, -1.0, animationGroupPirate.idleLookInChest.to, 0);
+                                            var obs1 = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
+                                            animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs1);
+                                                animationGroupPirate.idleLookInChest.freeAnimation = true;
+                                                if (animationGroupPirate.idleBegin) {
+                                                    if (currentGroup) {
+                                                        currentGroup.stop();
+                                                    }
+                                                    animationGroupPirate.idleBegin.start(true);
+                                                    currentGroup = animationGroupPirate.idleBegin;
+                                                }
+                                            });
+                                       }, 500);
+                                    });
+                                }
                             }
                         }
                     }
@@ -680,6 +764,26 @@ if (BABYLON.Engine.isSupported()) {
                         moveFreeSpin = true;
                         countSymbolScaling = 15;
                      //   freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
+                }
+                if (startAnimationCharacter && animationGroupPirate.idleLookInChest.freeAnimation) {
+                    startAnimationCharacter = false;
+                    if (animationGroupPirate.idleFreeSpin) {
+                        if (currentGroup) {
+                            currentGroup.stop();
+                        }
+                        animationGroupPirate.idleFreeSpin.start(true);
+                        currentGroup = animationGroupPirate.idleFreeSpin;
+                    }
+
+                    setTimeout(() => {
+                        if (animationGroupPirate.idleBegin) {
+                            if (currentGroup) {
+                                currentGroup.stop();
+                            }
+                            animationGroupPirate.idleBegin.start(true);
+                            currentGroup = animationGroupPirate.idleBegin;
+                        }
+                    }, 1000);
                 }
             });
             scene.registerAfterRender(function () {
@@ -701,6 +805,14 @@ if (BABYLON.Engine.isSupported()) {
                         freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
                         startRoundGame();
                         showRoundScore = true;
+
+                       /* if (animationGroupPirate.idleBegin) {
+                            if (currentGroup) {
+                                currentGroup.stop();
+                            }
+                            animationGroupPirate.idleBegin.start(true, animationGroupPirate.idleBegin.speedRatio, animationGroupPirate.idleBegin.from, animationGroupPirate.idleBegin.to);
+                            currentGroup = animationGroupPirate.idleBegin;
+                        }*/
                     }
                 }
             });
