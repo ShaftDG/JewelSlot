@@ -5,7 +5,7 @@ function AnimationMoveInChestPartMap(targetBackward, duration)
     var signX = 1;
     var signY = 1;
 
-    var partMap;
+    var partMap = scene.getMeshByName( object.name + "." + "map_1" );
     if (scene.getMeshByName( object.name + "." + "map_1" ).visibility) {
         partMap = scene.getMeshByName( object.name + "." + "map_1" );
         signX = -1;

@@ -315,12 +315,14 @@ if (BABYLON.Engine.isSupported()) {
 
         Promise.all([
             BABYLON.SceneLoader.ImportMesh("", "models/anim/", "anim.gltf", scene, function (newMeshes, particleSystems, skeletons) {
-                newMeshes[0].name = "anim";
-                newMeshes[0].position.x = 30.0;
-                newMeshes[0].position.y = -9.0;
+                animationGroupPirate.object = newMeshes[0];
+                newMeshes[0].position.x = 31.0;
+                newMeshes[0].position.y = -18.5;
                 newMeshes[0].position.z = -12.0;
 
-                newMeshes[0].rotation.y = -0.5;
+                newMeshes[0].scaling = new BABYLON.Vector3(1.4, 1.4, -1.4);
+
+                newMeshes[0].rotation.y = -Math.PI / 3.75;
              /*   scene.animationGroups[0].start(true);
                 currentGroup = scene.animationGroups[0];*/
                 var overrides = new BABYLON.AnimationPropertiesOverride();
@@ -331,8 +333,8 @@ if (BABYLON.Engine.isSupported()) {
 
                 skeletons[0].animationPropertiesOverride = overrides;
 
-                scene.animationGroups[0].start(true);
-                currentGroup = scene.animationGroups[0];
+                scene.animationGroups[3].start(true);
+                currentGroup = scene.animationGroups[3];
             }),
             BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
@@ -731,7 +733,7 @@ if (BABYLON.Engine.isSupported()) {
                                 credit.setTextForAnimation(genCombination.totalScore);
 
 
-                                if (animationGroupPirate.idleLookInChest && totalRound >= 500) {
+                                if (animationGroupPirate.idleLookInChest && totalRound >= 250) {
                                     if (currentGroup) {
                                         currentGroup.stop();
                                     }
@@ -740,20 +742,29 @@ if (BABYLON.Engine.isSupported()) {
                                     currentGroup = animationGroupPirate.idleLookInChest;
                                     var obs = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
                                        animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs);
-                                       setTimeout( () => {
-                                           animationGroupPirate.idleLookInChest.start(false, -1.0, animationGroupPirate.idleLookInChest.to, 0);
-                                            var obs1 = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
+                                       animationGroupPirate.idleLookInChest.start(false, -1.0, animationGroupPirate.idleLookInChest.to, 0);
+                                       var obs1 = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
                                             animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs1);
-                                                animationGroupPirate.idleLookInChest.freeAnimation = true;
-                                                if (animationGroupPirate.idleBegin) {
-                                                    if (currentGroup) {
-                                                        currentGroup.stop();
-                                                    }
-                                                    animationGroupPirate.idleBegin.start(true);
-                                                    currentGroup = animationGroupPirate.idleBegin;
+                                            animationGroupPirate.idleLookInChest.freeAnimation = true;
+                                            if (animationGroupPirate.idleFreeSpin) {
+                                                if (currentGroup) {
+                                                    currentGroup.stop();
                                                 }
-                                            });
-                                       }, 500);
+                                                animationGroupPirate.idleFreeSpin.start(false);
+                                                currentGroup = animationGroupPirate.idleFreeSpin;
+                                                var obs2 = animationGroupPirate.idleFreeSpin.onAnimationGroupEndObservable.add(function(){
+                                                    animationGroupPirate.idleFreeSpin.onAnimationGroupEndObservable.remove(obs2);
+                                                    if (animationGroupPirate.idleBegin) {
+                                                        if (currentGroup) {
+                                                            currentGroup.stop();
+                                                        }
+                                                        animationGroupPirate.idleBegin.start(true);
+                                                        currentGroup = animationGroupPirate.idleBegin;
+
+                                                    }
+                                                });
+                                            }
+                                       });
                                     });
                                 }
                             }
