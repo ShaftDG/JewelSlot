@@ -34,12 +34,12 @@ function FireBall(emitter) {
     // particleSystem.color2 = new BABYLON.Color3(1.90, 1.68, 0.1);
 
     particleSystem.addSizeGradient(0, 3.0, 3.0);
-    particleSystem.addSizeGradient(0.2, 2.5, 2.5);
-    particleSystem.addSizeGradient(0.4, 2.0, 2.0);
-    particleSystem.addSizeGradient(0.6, 1.5, 1.5);
-    particleSystem.addSizeGradient(0.8, 1.0, 1.0);
-    particleSystem.addSizeGradient(1.0, 0.5, 0.5);
-    particleSystem.addSizeGradient(1.2, 0.0, 0.0);
+    particleSystem.addSizeGradient(0.2, 4.5, 4.5);
+    particleSystem.addSizeGradient(0.4, 3.0, 3.0);
+    particleSystem.addSizeGradient(0.6, 2, 2);
+    particleSystem.addSizeGradient(0.8, 1.5, 1.5);
+    particleSystem.addSizeGradient(1.0, 1.0, 1.0);
+    particleSystem.addSizeGradient(1.2, 0.5, 0.5);
 
     particleSystem.addColorGradient(0.9, new BABYLON.Color4.FromHexString("#0882ffff"));
     particleSystem.addColorGradient(0.9, new BABYLON.Color4.FromHexString("#fdcf58ff"));

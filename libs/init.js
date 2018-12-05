@@ -48,10 +48,10 @@ if (BABYLON.Engine.isSupported()) {
 
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
-        var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_2k.hdr", scene, 512, false, false) ;
+        var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_1k.hdr", scene, 512, false, false) ;
         scene.environmentTexture = hdrTexture;
-        var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
-        hdrTexture1.rotationY = skyBox.rotation.y = -Math.PI*0.8;
+        // var skyBox = scene.createDefaultSkybox(hdrTexture1, true, 1000, 0.005);
+        hdrTexture1.rotationY = /*skyBox.rotation.y =*/ -Math.PI*0.8;
         texturesJewel = [...texturesJewel, hdrTexture];
         var textureMapNoise = new BABYLON.Texture("textures/noiseCombustion.png", scene);
         texturesJewel = [...texturesJewel, textureMapNoise];
@@ -60,12 +60,20 @@ if (BABYLON.Engine.isSupported()) {
     /*    var emissiveTextureMap = new BABYLON.Texture("models/PirateTreasureMapScroll_emissive.jpg", scene);
         texturesJewel = [...texturesJewel, emissiveTextureMap];*/
 
-        var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.35, width: 0.4});
-        var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.36, width: 0.4});
-        var bet = new TextLabel( new BABYLON.Vector3(-0.7, 0, 0), scene, 300, {height:0.35, width: 0.4});
-        var lines = new TextLabel( new BABYLON.Vector3(1.2, 0, 0), scene, 300, {height:0.35, width: 0.4});
+        var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.45, width: 0.5});
+        var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.46, width: 0.5});
+        var nameSlot = BABYLON.MeshBuilder.CreatePlane("plane", {height:0.8, width: 5, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+        nameSlot.rotation.y = Math.PI;
+        nameSlot.parent = roundScore.anchor;
+        var materialNameSlot = new BABYLON.StandardMaterial("materialNameSlot", scene);
+        materialNameSlot.diffuseTexture = new BABYLON.Texture("textures/roundplane/nameSlot.png", scene);
+        materialNameSlot.diffuseTexture.hasAlpha = true;
+        nameSlot.material = materialNameSlot;
 
-        var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.35*8, width: 0.4*8});
+        var bet = new TextLabel( new BABYLON.Vector3(-0.7, 0, 0), scene, 300, {height:0.45, width: 0.5});
+        var lines = new TextLabel( new BABYLON.Vector3(1.2, 0, 0), scene, 300, {height:0.45, width: 0.5});
+
+        var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.45*8, width: 0.5*8});
         freeSpin.setOnOff(false);
 
         var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
@@ -286,7 +294,63 @@ if (BABYLON.Engine.isSupported()) {
         var distanceBetweenSymbolColl = 6;
         var halfLengthRow = (distanceBetweenSymbolRow * (countColl-1)) / 2;
         var halfLengthColl = (distanceBetweenSymbolColl * (countRow-1)) / 2;
+        var plusLineButton, minusLineButton;
+        var plusLineObservable = function () {
+            if (!genCombination.numFreeSpin) {
+                genCombination.toIncreaseLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                enableButton(minusLineButton);
+                if (genCombination.isMaxLines) {
+                    unEnableButton(plusLineButton);
+                }
+            }
+        };
+        var minusLineObservable = function () {
+            if (!genCombination.numFreeSpin) {
+                genCombination.reduceLines();
+                lines.setTextForAnimation(genCombination.winLineNum.toString());
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                enableButton(plusLineButton);
+                if (genCombination.isMinLines) {
+                    unEnableButton(minusLineButton);
+                }
+            }
+        };
+        var maxBetButton, plusBetButton, minusBetButton;
 
+        var maxBetButtonObservable = function () {
+            if (!genCombination.numFreeSpin) {
+                genCombination.setMaxBet();
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                unEnableButton(plusBetButton);
+                enableButton(minusBetButton);
+            }
+        };
+        var plusBetButtonObservable = function () {
+            if (!genCombination.numFreeSpin) {
+                genCombination.toIncreaseBet();
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                /* genCombination.toIncreaseLines();
+                 lines.setTextForAnimation(genCombination.winLineNum.toString());*/
+                enableButton(minusBetButton);
+                if (genCombination.isMaxBet) {
+                    unEnableButton(plusBetButton);
+                }
+            }
+        };
+        var minusBetButtonObservable = function () {
+            if (!genCombination.numFreeSpin) {
+                genCombination.reduceBet();
+                bet.setTextForAnimation(genCombination.getTotalBet().toString());
+                /*  genCombination.reduceLines();
+                  lines.setTextForAnimation(genCombination.winLineNum.toString());*/
+                enableButton(plusBetButton);
+                if (genCombination.isMinBet) {
+                    unEnableButton(minusBetButton);
+                }
+            }
+        };
         var optionsWinLines = {
             maskWinLine: genCombination.maskWinLine,
             distanceBetweenSymbolRow: distanceBetweenSymbolRow,
@@ -319,7 +383,13 @@ if (BABYLON.Engine.isSupported()) {
                 newMeshes[0].position.x = 31.0;
                 newMeshes[0].position.y = -18.5;
                 newMeshes[0].position.z = -12.0;
-
+                newMeshes[0]._children.map(v => {
+                    if(v.material) {
+                        v.material.reflectionTexture = hdrTexture;
+                        v.receiveShadows = true;
+                        shadowGenerator.addShadowCaster(v);
+                    }
+                });
                 newMeshes[0].scaling = new BABYLON.Vector3(1.4, 1.4, -1.4);
 
                 newMeshes[0].rotation.y = -Math.PI / 3.75;
@@ -333,8 +403,8 @@ if (BABYLON.Engine.isSupported()) {
 
                 skeletons[0].animationPropertiesOverride = overrides;
 
-                scene.animationGroups[3].start(true);
-                currentGroup = scene.animationGroups[3];
+                scene.animationGroups[0].start(true);
+                currentGroup = scene.animationGroups[0];
             }),
             BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
@@ -342,6 +412,7 @@ if (BABYLON.Engine.isSupported()) {
                 newMeshes[0].position.z -= 1.0;
                 newMeshes[0]._children.map(v => {
                     v.material.reflectionTexture = hdrTexture;
+                    v.material.environmentIntensity = 0.3;
                     v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                 });
                 freeSpin.compass = {arrow: newMeshes[1], cup: newMeshes[2]};
@@ -355,6 +426,7 @@ if (BABYLON.Engine.isSupported()) {
             rightCheckWinLines._children.map(v => {
                     var mat = v.material.clone();
                     mat.reflectionTexture = hdrTexture;
+                    mat.environmentIntensity = 0.3;
                     mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
                     mat.emissiveIntensity = 0.0;
                     v.material = mat;
@@ -406,16 +478,8 @@ if (BABYLON.Engine.isSupported()) {
                 deltaPush: new BABYLON.Vector3(0,0,0.05),
                 positionButton: new BABYLON.Vector3(0.8,0.02,0)
             };
-            var minusLineButton = MakeButton("plusLineButton", minusMesh, rightBet, optionMinusLineButton, manager);
-            minusLineButton.onPointerUpObservable.add(function () {
-                genCombination.reduceLines();
-                lines.setTextForAnimation(genCombination.winLineNum.toString());
-                bet.setTextForAnimation(genCombination.getTotalBet().toString());
-                enableButton(plusLineButton);
-                if (genCombination.isMinLines) {
-                    unEnableButton(minusLineButton);
-                }
-            });
+            minusLineButton = MakeButton("plusLineButton", minusMesh, rightBet, optionMinusLineButton, manager);
+            minusLineButton.onPointerUpObservable.add(minusLineObservable);
 
             var plusMesh = minusMesh.clone();
             plusMesh.material = materialLinesButton.clone();
@@ -424,16 +488,8 @@ if (BABYLON.Engine.isSupported()) {
                 deltaPush: new BABYLON.Vector3(0,0,0.05),
                 positionButton: new BABYLON.Vector3(1.6,0.02,0)
             };
-            var plusLineButton = MakeButton("plusLineButton", plusMesh, rightBet, optionPlusLineButton, manager);
-            plusLineButton.onPointerUpObservable.add(function () {
-                genCombination.toIncreaseLines();
-                lines.setTextForAnimation(genCombination.winLineNum.toString());
-                bet.setTextForAnimation(genCombination.getTotalBet().toString());
-                enableButton(minusLineButton);
-                if (genCombination.isMaxLines) {
-                    unEnableButton(plusLineButton);
-                }
-            });
+            plusLineButton = MakeButton("plusLineButton", plusMesh, rightBet, optionPlusLineButton, manager);
+            plusLineButton.onPointerUpObservable.add(plusLineObservable);
 
             unEnableButton(plusLineButton);
             enableButton(minusLineButton);
@@ -454,16 +510,36 @@ if (BABYLON.Engine.isSupported()) {
             newMeshes[0].position.y = -10.648;
             newMeshes[0].position.z = -29;
             newMeshes[0].scaling = new BABYLON.Vector3(-5, 5, 5);
-
+            newMeshes.map(v => {
+                if (v.material) {
+                    v.material.reflectionTexture = hdrTexture1;
+                    v.material.environmentIntensity = 0.3;
+                    if (v.name === "door" || v.name === "gradeLeft" ||
+                        v.name === "gradeRight" || v.name === "walls") {
+                        v.receiveShadows = true;
+                        v.material.albedoColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+                    } else {
+                        v.receiveShadows = true;
+                        shadowGenerator.addShadowCaster(v);
+                    }
+                }
+            });
+          /*  console.log(newMeshes);
             newMeshes[0]._children.map(v => {
                 v.material.reflectionTexture = hdrTexture;
                 v.receiveShadows = true;
                 shadowGenerator.addShadowCaster(v);
+               /!* v._children.map(vv => {
+                    vv.material.reflectionTexture = hdrTexture;
+                    vv.receiveShadows = true;
+                    shadowGenerator.addShadowCaster(vv);
+                    console.log(vv.name);
+                });*!/
                 // console.log(v.name);
-            });
+            });*/
 
-            newMeshes[11].receiveShadows = true;
-            shadowGenerator.addShadowCaster(newMeshes[11]);
+            // newMeshes[11].receiveShadows = true;
+            // shadowGenerator.addShadowCaster(newMeshes[11]);
 /////////////////////////////////////
 //             ElectricField(newMeshes[8]);
 /////////////////////////////////////
@@ -471,7 +547,7 @@ if (BABYLON.Engine.isSupported()) {
                 deltaPush: new BABYLON.Vector3(0,0.1,0)
             };
 
-           var startButton = MakeButton("startButton", newMeshes[1], newMeshes[8], optionStartButton, manager);
+           var startButton = MakeButton("startButton", newMeshes[1], newMeshes[12], optionStartButton, manager);
 
             startButton.onPointerUpObservable.add(function () {
                 endScaling = false;
@@ -489,6 +565,35 @@ if (BABYLON.Engine.isSupported()) {
                 leftCheckWinLines._children.map(v => {
                     v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                 });
+
+                if (genCombination.numFreeSpin) {
+                    unEnableButton(plusLineButton);
+                    unEnableButton(minusLineButton);
+                    unEnableButton(maxBetButton);
+                    unEnableButton(plusBetButton);
+                    unEnableButton(minusBetButton);
+                } else {
+                    if (!autoPlay) {
+                        if (genCombination.isMaxLines) {
+                            enableButton(minusLineButton);
+                        } else if (genCombination.isMinLines) {
+                            enableButton(plusLineButton);
+                        } else {
+                            enableButton(minusLineButton);
+                            enableButton(plusLineButton);
+                        }
+
+                        enableButton(maxBetButton);
+                        if (genCombination.isMaxBet) {
+                            enableButton(minusBetButton);
+                        } else if (genCombination.isMinBet) {
+                            enableButton(plusBetButton);
+                        } else {
+                            enableButton(minusBetButton);
+                            enableButton(plusBetButton);
+                        }
+                    }
+                }
               /*  if (animationGroupPirate.idleBegin) {
                     if (currentGroup) {
                         currentGroup.stop();
@@ -502,46 +607,56 @@ if (BABYLON.Engine.isSupported()) {
                 deltaPush: new BABYLON.Vector3(0,-0.05,0)
             };
 
-            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[5], newMeshes[10], optionSecondButton, manager);
+            maxBetButton = MakeButton("maxBetButton", newMeshes[4], newMeshes[13], optionSecondButton, manager);
+            maxBetButton.onPointerUpObservable.add(maxBetButtonObservable);
+            plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[14], optionSecondButton, manager);
+            plusBetButton.onPointerUpObservable.add(plusBetButtonObservable);
+            minusBetButton = MakeButton("minusBetButton", newMeshes[2], newMeshes[13], optionSecondButton, manager);
+            unEnableButton(minusBetButton);
+            minusBetButton.onPointerUpObservable.add(minusBetButtonObservable);
+
+            var autoPlayButton = MakeButton("autoPlayButton", newMeshes[5], newMeshes[14], optionSecondButton, manager);
             autoPlayButton.onPointerUpObservable.add(function () {
                 autoPlay = !autoPlay;
                 if (autoPlay) {
                     autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.5,0.25,0.125);
                     autoPlayButton.mesh.material.emissiveIntensity = 0.05;
+                    minusLineButton.onPointerUpObservable.clear();
+                    plusLineButton.onPointerUpObservable.clear();
+                    maxBetButton.onPointerUpObservable.clear();
+                    plusBetButton.onPointerUpObservable.clear();
+                    minusBetButton.onPointerUpObservable.clear();
+                    unEnableButton(plusLineButton);
+                    unEnableButton(minusLineButton);
+                    unEnableButton(maxBetButton);
+                    unEnableButton(plusBetButton);
+                    unEnableButton(minusBetButton);
                 } else {
                     autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.0,0.0,0.0);
                     autoPlayButton.mesh.material.emissiveIntensity = 0.0;
-                }
-            });
+                    minusLineButton.onPointerUpObservable.add(minusLineObservable);
+                    plusLineButton.onPointerUpObservable.add(plusLineObservable);
+                    maxBetButton.onPointerUpObservable.add(maxBetButtonObservable);
+                    plusBetButton.onPointerUpObservable.add(plusBetButtonObservable);
+                    minusBetButton.onPointerUpObservable.add(minusBetButtonObservable);
+                    if (genCombination.isMaxLines) {
+                        enableButton(minusLineButton);
+                    } else if (genCombination.isMinLines) {
+                        enableButton(plusLineButton);
+                    } else {
+                        enableButton(minusLineButton);
+                        enableButton(plusLineButton);
+                    }
 
-            var maxBetButton = MakeButton("maxBetButton", newMeshes[4], newMeshes[9], optionSecondButton, manager);
-            maxBetButton.onPointerUpObservable.add(function () {
-                genCombination.setMaxBet();
-                bet.setTextForAnimation(genCombination.getTotalBet().toString());
-                unEnableButton(plusBetButton);
-                enableButton(minusBetButton);
-            });
-            var plusBetButton = MakeButton("plusBetButton ", newMeshes[3], newMeshes[10], optionSecondButton, manager);
-            plusBetButton.onPointerUpObservable.add(function () {
-                genCombination.toIncreaseBet();
-                bet.setTextForAnimation(genCombination.getTotalBet().toString());
-               /* genCombination.toIncreaseLines();
-                lines.setTextForAnimation(genCombination.winLineNum.toString());*/
-                enableButton(minusBetButton);
-                if (genCombination.isMaxBet) {
-                    unEnableButton(plusBetButton);
-                }
-            });
-            var minusBetButton = MakeButton("minusBetButton", newMeshes[2], newMeshes[9], optionSecondButton, manager);
-            unEnableButton(minusBetButton);
-            minusBetButton.onPointerUpObservable.add(function () {
-                genCombination.reduceBet();
-                bet.setTextForAnimation(genCombination.getTotalBet().toString());
-              /*  genCombination.reduceLines();
-                lines.setTextForAnimation(genCombination.winLineNum.toString());*/
-                enableButton(plusBetButton);
-                if (genCombination.isMinBet) {
-                    unEnableButton(minusBetButton);
+                    enableButton(maxBetButton);
+                    if (genCombination.isMaxBet) {
+                        enableButton(minusBetButton);
+                    } else if (genCombination.isMinBet) {
+                        enableButton(plusBetButton);
+                    } else {
+                        enableButton(minusBetButton);
+                        enableButton(plusBetButton);
+                    }
                 }
             });
 
@@ -558,14 +673,12 @@ if (BABYLON.Engine.isSupported()) {
                     particles: fireBall
                 };
 
-
                 for (var i = 0; i < countRow; i++) {
                     var y = distanceBetweenSymbolColl * i - halfLengthColl;
                     for (var j = 0; j < countColl; j++) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
                         mesh.scaling = new BABYLON.Vector3(0.001, 0.001, 0.001);
-                     //   shadowGenerator.addShadowCaster(mesh);
                         var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
                         DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0));
                         mapAllSymbol.set(j + "-" + i, obj);
@@ -651,7 +764,7 @@ if (BABYLON.Engine.isSupported()) {
             scene.executeWhenReady(function () {
                 engine.hideLoadingUI();
                 optimizer.start();
-                OpenChest.call(newMeshes[11], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
+                OpenChest.call(newMeshes[16], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
                 credit.setTextForAnimation(genCombination.totalScore.toString());
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 lines.setTextForAnimation(genCombination.winLineNum.toString());
@@ -661,7 +774,7 @@ if (BABYLON.Engine.isSupported()) {
                     animationGroupPirate[v.name] = v;
                     animationGroupPirate[v.name].freeAnimation = true;
                 });
-                console.log(scene.animationGroups);
+                // console.log(scene.animationGroups);
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -697,6 +810,7 @@ if (BABYLON.Engine.isSupported()) {
                                 showRoundScore = false;
                                 var totalRound = genCombination.getTotalRound();
                                 roundScore.setTextForAnimation(totalRound.toString());
+                                nameSlot.visibility = false;
                             }
                             objWineline.setEnabled(true);
                             enableColorCheckLine(objCheckLine);
@@ -726,9 +840,14 @@ if (BABYLON.Engine.isSupported()) {
                             } else {
                                 endScaling = false;
                                 dropInChest = true;
-                                moveFreeSpin = true;
+                                if (genCombination.isFreeSpin) {
+                                    moveFreeSpin = true;
+                                } else {
+                                    moveFreeSpin = false;
+                                }
                                 var totalRound = genCombination.getTotalRound();
                                 roundScore.zeroing();
+                                nameSlot.visibility = true;
                                 genCombination.gettingWinnings();
                                 credit.setTextForAnimation(genCombination.totalScore);
 
@@ -740,31 +859,30 @@ if (BABYLON.Engine.isSupported()) {
                                     animationGroupPirate.idleLookInChest.start(false);
                                     animationGroupPirate.idleLookInChest.freeAnimation = false;
                                     currentGroup = animationGroupPirate.idleLookInChest;
-                                    var obs = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
-                                       animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs);
+                                    animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
                                        animationGroupPirate.idleLookInChest.start(false, -1.0, animationGroupPirate.idleLookInChest.to, 0);
-                                       var obs1 = animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
-                                            animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.remove(obs1);
+                                       animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
                                             animationGroupPirate.idleLookInChest.freeAnimation = true;
-                                            if (animationGroupPirate.idleFreeSpin) {
+                                            if (animationGroupPirate.idleAfterLookInChest) {
                                                 if (currentGroup) {
                                                     currentGroup.stop();
                                                 }
-                                                animationGroupPirate.idleFreeSpin.start(false);
-                                                currentGroup = animationGroupPirate.idleFreeSpin;
-                                                var obs2 = animationGroupPirate.idleFreeSpin.onAnimationGroupEndObservable.add(function(){
-                                                    animationGroupPirate.idleFreeSpin.onAnimationGroupEndObservable.remove(obs2);
+                                                animationGroupPirate.idleAfterLookInChest.start(false);
+                                                currentGroup = animationGroupPirate.idleAfterLookInChest;
+                                                animationGroupPirate.idleAfterLookInChest.onAnimationGroupEndObservable.add(function(){
                                                     if (animationGroupPirate.idleBegin) {
                                                         if (currentGroup) {
                                                             currentGroup.stop();
                                                         }
                                                         animationGroupPirate.idleBegin.start(true);
                                                         currentGroup = animationGroupPirate.idleBegin;
-
                                                     }
+                                                    animationGroupPirate.idleAfterLookInChest.onAnimationGroupEndObservable.clear();
                                                 });
                                             }
+                                            animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.clear();
                                        });
+                                        animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.clear();
                                     });
                                 }
                             }
@@ -772,7 +890,11 @@ if (BABYLON.Engine.isSupported()) {
                     }
                 } else  if (!mapLineWin.size && endScaling && endDrop) {
                         endScaling = false;
+                    if (genCombination.isFreeSpin) {
                         moveFreeSpin = true;
+                    } else {
+                        moveFreeSpin = false;
+                    }
                         countSymbolScaling = 15;
                      //   freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
                 }
@@ -782,11 +904,11 @@ if (BABYLON.Engine.isSupported()) {
                         if (currentGroup) {
                             currentGroup.stop();
                         }
-                        animationGroupPirate.idleFreeSpin.start(true);
+                        animationGroupPirate.idleFreeSpin.start(false);
                         currentGroup = animationGroupPirate.idleFreeSpin;
                     }
 
-                    setTimeout(() => {
+                    setTimeout( () => {
                         if (animationGroupPirate.idleBegin) {
                             if (currentGroup) {
                                 currentGroup.stop();
@@ -794,7 +916,7 @@ if (BABYLON.Engine.isSupported()) {
                             animationGroupPirate.idleBegin.start(true);
                             currentGroup = animationGroupPirate.idleBegin;
                         }
-                    }, 1000);
+                    }, 1500);
                 }
             });
             scene.registerAfterRender(function () {

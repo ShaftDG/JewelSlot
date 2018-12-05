@@ -13,8 +13,8 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
     this.isMinBet = true;
 
     this.minLines = 3;
-    this.isMaxLines = false;
-    this.isMinLines = true;
+    this.isMaxLines = true;
+    this.isMinLines = false;
 
     this.totalScore = 250250;
 

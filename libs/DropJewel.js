@@ -1,4 +1,4 @@
-function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationDown, speedMove) {
+function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationDown) {
     var object = this;
 
     var durationPosition = 60;
@@ -67,6 +67,9 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
                 animationScaling.animationStarted = false;
                     object.scaling = new BABYLON.Vector3(1,1,1);
                     object.position.y = 20;
+                    object._children.map(v => {
+                       v.visibility = false;
+                    });
                     object.userData.endScalingAnimation = true;
                     endScaling = true;
                 }
