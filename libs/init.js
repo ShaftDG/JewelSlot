@@ -62,7 +62,7 @@ if (BABYLON.Engine.isSupported()) {
 
         var credit = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.45, width: 0.5});
         var roundScore = new TextLabel( new BABYLON.Vector3(0, 0, 0), scene, 60, {height:0.46, width: 0.5});
-        var nameSlot = BABYLON.MeshBuilder.CreatePlane("plane", {height:0.8, width: 5, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+        var nameSlot = BABYLON.MeshBuilder.CreatePlane("nameSlot", {height:0.8, width: 5, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
         nameSlot.rotation.y = Math.PI;
         nameSlot.parent = roundScore.anchor;
         var materialNameSlot = new BABYLON.StandardMaterial("materialNameSlot", scene);
@@ -75,8 +75,39 @@ if (BABYLON.Engine.isSupported()) {
 
         var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.45*8, width: 0.5*8});
         freeSpin.setOnOff(false);
+// spider web
+        var planeSpiderWeb = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb", {height:0.65, width: 1.0/*, sideOrientation: BABYLON.Mesh.DOUBLESIDE*/}, scene);
+        planeSpiderWeb.rotation.y = Math.PI / 2;
+        planeSpiderWeb.rotation.x = 0.05;
+        planeSpiderWeb.position.z = -0.3;
+        planeSpiderWeb.position.y = 0.32;
+        var materialSpiderWeb = new BABYLON.StandardMaterial("materialSpiderWeb", scene);
+        materialSpiderWeb.diffuseTexture = new BABYLON.Texture("textures/spiderweb/web.png", scene);
+        materialSpiderWeb.opacityTexture = materialSpiderWeb.diffuseTexture;
 
-        var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 5, 41), scene);
+        planeSpiderWeb.material = materialSpiderWeb;
+
+        var planeSpiderWeb1 = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb1", {height:1.0, width: 4}, scene);
+        planeSpiderWeb1.position.z = -0.12;
+        planeSpiderWeb1.position.y = -0.8;
+        var materialSpiderWeb1 = new BABYLON.StandardMaterial("materialSpiderWeb1", scene);
+        materialSpiderWeb1.diffuseTexture =  new BABYLON.Texture("textures/spiderweb/web1.png", scene);
+        materialSpiderWeb1.opacityTexture = materialSpiderWeb1.diffuseTexture;
+        planeSpiderWeb1.material = materialSpiderWeb1;
+
+        var planeSpiderWeb2 = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb2", {height:3, width: 5, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+        planeSpiderWeb2.scaling = new BABYLON.Vector3(-4.5, 4.5, 4.5);
+        planeSpiderWeb2.position.x = 24;
+        planeSpiderWeb2.position.y = -18.0;
+        planeSpiderWeb2.position.z = -0.1;
+        planeSpiderWeb2.rotation.y = -0.2;
+        planeSpiderWeb2.rotation.z = -0.0872664626;
+        var materialSpiderWeb2 = new BABYLON.StandardMaterial("materialSpiderWeb2", scene);
+        materialSpiderWeb2.diffuseTexture =  new BABYLON.Texture("textures/spiderweb/web2.png", scene);
+        materialSpiderWeb2.opacityTexture = materialSpiderWeb2.diffuseTexture;
+        planeSpiderWeb2.material = materialSpiderWeb2;
+
+        var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 7, 41), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
         camera.attachControl(canvas, false);
@@ -391,20 +422,18 @@ if (BABYLON.Engine.isSupported()) {
                     }
                 });
                 newMeshes[0].scaling = new BABYLON.Vector3(1.4, 1.4, -1.4);
-
+ // console.log(scene.animationGroups);
                 newMeshes[0].rotation.y = -Math.PI / 3.75;
-             /*   scene.animationGroups[0].start(true);
-                currentGroup = scene.animationGroups[0];*/
-                var overrides = new BABYLON.AnimationPropertiesOverride();
 
+                var overrides = new BABYLON.AnimationPropertiesOverride();
                 overrides.enableBlending = true;
                 overrides.blendingSpeed = 0.05;
                 overrides.loopMode = 0;
 
                 skeletons[0].animationPropertiesOverride = overrides;
 
-                scene.animationGroups[0].start(true);
-                currentGroup = scene.animationGroups[0];
+                scene.animationGroups[3].start(true);
+                currentGroup = scene.animationGroups[3];
             }),
             BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
@@ -415,11 +444,7 @@ if (BABYLON.Engine.isSupported()) {
                     v.material.environmentIntensity = 0.3;
                     v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                 });
-                freeSpin.compass = {arrow: newMeshes[1], cup: newMeshes[2]};
-              //  newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 3.4, 5);
-              //  OpenChest.call(newMeshes[2], new BABYLON.Vector3(0,Math.PI*0.4,0), 15);
-              //  OpenChest.call(newMeshes[1], new BABYLON.Vector3(0,0,Math.PI*10), 15);
-
+                freeSpin.compass = {arrow: newMeshes[1], cup: newMeshes[3]};
             }),
         BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
             rightCheckWinLines = newMeshes[1];
@@ -443,6 +468,8 @@ if (BABYLON.Engine.isSupported()) {
             leftCheckWinLines.position.x = -newMeshes[0].position.x;
             leftCheckWinLines.position.y = newMeshes[0].position.y;
             leftCheckWinLines.position.z = newMeshes[0].position.z;
+
+            planeSpiderWeb.parent = rightCheckWinLines;
         }),
 
         BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.gltf", scene, function (newMeshes) {
@@ -454,7 +481,6 @@ if (BABYLON.Engine.isSupported()) {
             newMeshes[0].rotation.y = -0.2;
             newMeshes[0].rotation.z = -0.0872664626;
             credit.anchor.parent = newMeshes[0];
-
             var rightBet = newMeshes[0].clone("rightBet");
             rightBet.scaling = new BABYLON.Vector3(4.5, 4.5, 4.5);
             rightBet.position.x = -22;
@@ -462,6 +488,7 @@ if (BABYLON.Engine.isSupported()) {
             rightBet.position.z = -0.8;
             rightBet.rotation.y = 0.2;
             rightBet.rotation.z = 0.0872664626;
+            planeSpiderWeb1.parent = rightBet;
             bet.anchor.parent = rightBet;
             bet.anchor.scaling = new BABYLON.Vector3(-1, 1, 1);
             lines.anchor.parent = rightBet;
@@ -503,6 +530,7 @@ if (BABYLON.Engine.isSupported()) {
             round.rotation.z = 0.0872664626*1.25;
             roundScore.anchor.parent = round;
             roundScore.anchor.scaling = new BABYLON.Vector3(-5/7, 1, 1);
+            planeSpiderWeb1.parent = round;
         }),
 
         BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
@@ -774,7 +802,64 @@ if (BABYLON.Engine.isSupported()) {
                     animationGroupPirate[v.name] = v;
                     animationGroupPirate[v.name].freeAnimation = true;
                 });
-                // console.log(scene.animationGroups);
+
+                animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function() {
+                    if (animationGroupPirate.idleLookInChestPlayBack) {
+                        if (currentGroup) {
+                            currentGroup.stop();
+                        }
+                        animationGroupPirate.idleLookInChestPlayBack.start(false);
+                        animationGroupPirate.idleLookInChestPlayBack.onAnimationGroupEndObservable.add(function () {
+                            if (animationGroupPirate.idleAfterLookInChest) {
+                                animationGroupPirate.idleAfterLookInChest.start(false);
+                                currentGroup = animationGroupPirate.idleAfterLookInChest;
+                                animationGroupPirate.idleAfterLookInChest.onAnimationGroupEndObservable.add(function () {
+                                    animationGroupPirate.idleAfterLookInChest.freeAnimation = true;
+                                    if (animationGroupPirate.idleBegin) {
+                                        if (currentGroup) {
+                                            currentGroup.stop();
+                                        }
+                                        animationGroupPirate.idleBegin.start(true);
+                                        currentGroup = animationGroupPirate.idleBegin;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+                animationGroupPirate.idleFreeSpin.onAnimationGroupEndObservable.add(function () {
+                    animationGroupPirate.idleFreeSpin.freeAnimation = true;
+                    if (animationGroupPirate.idleBegin) {
+                        if (currentGroup) {
+                            currentGroup.stop();
+                        }
+                        animationGroupPirate.idleBegin.start(true);
+                        currentGroup = animationGroupPirate.idleBegin;
+                    }
+
+                   /* if (animationGroupPirate.idleBegin && currentGroup) {
+                        currentGroup.setWeightForAllAnimatables(1);
+                        animationGroupPirate.idleBegin.setWeightForAllAnimatables(0);
+                        animationGroupPirate.idleBegin.start(true);
+                        var weightAnim = 0;
+                        let obs = scene.onBeforeAnimationsObservable.add(function () {
+                            weightAnim += 0.01;
+                            if (weightAnim >= 1) {
+                                scene.onBeforeAnimationsObservable.remove(obs);
+                                animationGroupPirate.idleBegin.setWeightForAllAnimatables(1);
+                                currentGroup.setWeightForAllAnimatables(0);
+                                currentGroup.stop();
+                                currentGroup = animationGroupPirate.idleBegin;
+                            } else {
+                                animationGroupPirate.idleBegin.setWeightForAllAnimatables(1 + weightAnim);
+                                currentGroup.setWeightForAllAnimatables(1 - weightAnim);
+                            }
+                        })
+                    }*/
+                });
+                        // console.log(scene.animationGroups);
+
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -824,7 +909,11 @@ if (BABYLON.Engine.isSupported()) {
                             });
                             mapObjs.moveForward = false;
 
-                            if (animationGroupPirate.idleWin && animationGroupPirate.idleLookInChest.freeAnimation) {
+                            if (
+                                animationGroupPirate.idleWin &&
+                                animationGroupPirate.idleAfterLookInChest.freeAnimation &&
+                                animationGroupPirate.idleFreeSpin.freeAnimation
+                            ) {
                                 if (currentGroup) {
                                     currentGroup.stop();
                                 }
@@ -851,39 +940,18 @@ if (BABYLON.Engine.isSupported()) {
                                 genCombination.gettingWinnings();
                                 credit.setTextForAnimation(genCombination.totalScore);
 
-
-                                if (animationGroupPirate.idleLookInChest && totalRound >= 250) {
+                                if (
+                                    animationGroupPirate.idleLookInChest && totalRound >= 250 &&
+                                    animationGroupPirate.idleFreeSpin.freeAnimation
+                                ) {
+                                    totalRound = 0;
+                                    console.log(totalRound);
                                     if (currentGroup) {
                                         currentGroup.stop();
                                     }
                                     animationGroupPirate.idleLookInChest.start(false);
-                                    animationGroupPirate.idleLookInChest.freeAnimation = false;
+                                    animationGroupPirate.idleAfterLookInChest.freeAnimation = false;
                                     currentGroup = animationGroupPirate.idleLookInChest;
-                                    animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
-                                       animationGroupPirate.idleLookInChest.start(false, -1.0, animationGroupPirate.idleLookInChest.to, 0);
-                                       animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.add(function(){
-                                            animationGroupPirate.idleLookInChest.freeAnimation = true;
-                                            if (animationGroupPirate.idleAfterLookInChest) {
-                                                if (currentGroup) {
-                                                    currentGroup.stop();
-                                                }
-                                                animationGroupPirate.idleAfterLookInChest.start(false);
-                                                currentGroup = animationGroupPirate.idleAfterLookInChest;
-                                                animationGroupPirate.idleAfterLookInChest.onAnimationGroupEndObservable.add(function(){
-                                                    if (animationGroupPirate.idleBegin) {
-                                                        if (currentGroup) {
-                                                            currentGroup.stop();
-                                                        }
-                                                        animationGroupPirate.idleBegin.start(true);
-                                                        currentGroup = animationGroupPirate.idleBegin;
-                                                    }
-                                                    animationGroupPirate.idleAfterLookInChest.onAnimationGroupEndObservable.clear();
-                                                });
-                                            }
-                                            animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.clear();
-                                       });
-                                        animationGroupPirate.idleLookInChest.onAnimationGroupEndObservable.clear();
-                                    });
                                 }
                             }
                         }
@@ -898,25 +966,19 @@ if (BABYLON.Engine.isSupported()) {
                         countSymbolScaling = 15;
                      //   freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
                 }
-                if (startAnimationCharacter && animationGroupPirate.idleLookInChest.freeAnimation) {
+                if (
+                    startAnimationCharacter &&
+                    animationGroupPirate.idleAfterLookInChest.freeAnimation
+                ) {
                     startAnimationCharacter = false;
                     if (animationGroupPirate.idleFreeSpin) {
-                        if (currentGroup) {
+                        if (currentGroup && currentGroup !== animationGroupPirate.idleFreeSpin) {
                             currentGroup.stop();
                         }
                         animationGroupPirate.idleFreeSpin.start(false);
+                        animationGroupPirate.idleFreeSpin.freeAnimation = false;
                         currentGroup = animationGroupPirate.idleFreeSpin;
                     }
-
-                    setTimeout( () => {
-                        if (animationGroupPirate.idleBegin) {
-                            if (currentGroup) {
-                                currentGroup.stop();
-                            }
-                            animationGroupPirate.idleBegin.start(true);
-                            currentGroup = animationGroupPirate.idleBegin;
-                        }
-                    }, 1500);
                 }
             });
             scene.registerAfterRender(function () {
