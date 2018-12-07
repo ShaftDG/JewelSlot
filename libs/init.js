@@ -76,22 +76,22 @@ if (BABYLON.Engine.isSupported()) {
         var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.45*8, width: 0.5*8});
         freeSpin.setOnOff(false);
 // spider web
-        var planeSpiderWeb = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb", {height:0.65, width: 1.0/*, sideOrientation: BABYLON.Mesh.DOUBLESIDE*/}, scene);
+        var planeSpiderWeb = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb", {height:0.75, width: 1.0/*, sideOrientation: BABYLON.Mesh.DOUBLESIDE*/}, scene);
         planeSpiderWeb.rotation.y = Math.PI / 2;
         planeSpiderWeb.rotation.x = 0.05;
         planeSpiderWeb.position.z = -0.3;
-        planeSpiderWeb.position.y = 0.32;
+        planeSpiderWeb.position.y = 0.34;
         var materialSpiderWeb = new BABYLON.StandardMaterial("materialSpiderWeb", scene);
         materialSpiderWeb.diffuseTexture = new BABYLON.Texture("textures/spiderweb/web.png", scene);
         materialSpiderWeb.opacityTexture = materialSpiderWeb.diffuseTexture;
-
         planeSpiderWeb.material = materialSpiderWeb;
 
         var planeSpiderWeb1 = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb1", {height:1.0, width: 4}, scene);
         planeSpiderWeb1.position.z = -0.12;
         planeSpiderWeb1.position.y = -0.8;
+        var textureWeb1 = new BABYLON.Texture("textures/spiderweb/web1.png", scene);
         var materialSpiderWeb1 = new BABYLON.StandardMaterial("materialSpiderWeb1", scene);
-        materialSpiderWeb1.diffuseTexture =  new BABYLON.Texture("textures/spiderweb/web1.png", scene);
+        materialSpiderWeb1.diffuseTexture = textureWeb1.clone();
         materialSpiderWeb1.opacityTexture = materialSpiderWeb1.diffuseTexture;
         planeSpiderWeb1.material = materialSpiderWeb1;
 
@@ -107,7 +107,16 @@ if (BABYLON.Engine.isSupported()) {
         materialSpiderWeb2.opacityTexture = materialSpiderWeb2.diffuseTexture;
         planeSpiderWeb2.material = materialSpiderWeb2;
 
-        var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 7, 41), scene);
+        var planeSpiderWeb3 = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb3", {height:1.0, width: 4}, scene);
+        planeSpiderWeb3.position.z = -0.12;
+        planeSpiderWeb3.position.y = -0.8;
+        planeSpiderWeb3.scaling = new BABYLON.Vector3(-1,1,1);
+        var materialSpiderWeb3 = new BABYLON.StandardMaterial("materialSpiderWeb3", scene);
+        materialSpiderWeb3.diffuseTexture = textureWeb1.clone();
+        materialSpiderWeb3.opacityTexture = materialSpiderWeb3.diffuseTexture;
+        planeSpiderWeb3.material = materialSpiderWeb3;
+
+        var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 7, 43), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
         camera.attachControl(canvas, false);
@@ -249,7 +258,6 @@ if (BABYLON.Engine.isSupported()) {
 
 
             var arr = genCombination.arrayCombination;
-
         /*    if (
                 genCombination.moveArray[0][4][1] === 1 &&
                 genCombination.moveArray[1][4][0] === 1 &&
@@ -292,7 +300,7 @@ if (BABYLON.Engine.isSupported()) {
                                     obj._children.map(v => {
                                         v.visibility = false;
                                     });
-                                    if (arr[j][h] !== 3) {
+                                    if (arr[j][h] !== genCombination.freeSpinSymb) {
                                         obj._children[arr[j][h]].visibility = true;
                                     } else {
                                         obj._children[arr[j][h]+numberPartMap].visibility = true;
@@ -389,7 +397,7 @@ if (BABYLON.Engine.isSupported()) {
             halfLengthRow: halfLengthRow,
             halfLengthColl: halfLengthColl,
             deltaBeginEnd: 4,
-            z: -0.75
+            z: -1.0
         };
         var winLines = WinLines(optionsWinLines, scene);
         var rightCheckWinLines, leftCheckWinLines;
@@ -439,6 +447,8 @@ if (BABYLON.Engine.isSupported()) {
                 newMeshes[0].name = "compass";
                 newMeshes[0].position = freeSpin.anchor.position.clone();
                 newMeshes[0].position.z -= 1.0;
+                newMeshes[0].rotation.y = 0.3;
+                freeSpin.anchor.rotation = newMeshes[0].rotation.clone();
                 newMeshes[0]._children.map(v => {
                     v.material.reflectionTexture = hdrTexture;
                     v.material.environmentIntensity = 0.3;
@@ -481,6 +491,7 @@ if (BABYLON.Engine.isSupported()) {
             newMeshes[0].rotation.y = -0.2;
             newMeshes[0].rotation.z = -0.0872664626;
             credit.anchor.parent = newMeshes[0];
+
             var rightBet = newMeshes[0].clone("rightBet");
             rightBet.scaling = new BABYLON.Vector3(4.5, 4.5, 4.5);
             rightBet.position.x = -22;
@@ -488,7 +499,7 @@ if (BABYLON.Engine.isSupported()) {
             rightBet.position.z = -0.8;
             rightBet.rotation.y = 0.2;
             rightBet.rotation.z = 0.0872664626;
-            planeSpiderWeb1.parent = rightBet;
+            planeSpiderWeb3.parent = rightBet;
             bet.anchor.parent = rightBet;
             bet.anchor.scaling = new BABYLON.Vector3(-1, 1, 1);
             lines.anchor.parent = rightBet;
@@ -546,6 +557,7 @@ if (BABYLON.Engine.isSupported()) {
                         v.name === "gradeRight" || v.name === "walls") {
                         v.receiveShadows = true;
                         v.material.albedoColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+                        // v.material.specularColor  = new BABYLON.Color3(0, 0, 0);
                     } else {
                         v.receiveShadows = true;
                         shadowGenerator.addShadowCaster(v);
@@ -689,9 +701,9 @@ if (BABYLON.Engine.isSupported()) {
             });
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
-               /* newMeshes[0]._children.map(v => {
+                newMeshes[0]._children.map(v => {
                     console.log(v.name);
-                });*/
+                });
                 var box = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.1}, scene);
                 box.visibility = false;
                 box.position = new BABYLON.Vector3(-0.75, 4.2, 9.0);

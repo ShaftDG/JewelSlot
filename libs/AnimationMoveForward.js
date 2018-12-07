@@ -10,7 +10,7 @@ function AnimationMoveForward(targetForward, duration)
     keysTorus.push({ frame: 0, value: object.position });
     keysTorus.push({ frame: 60, value: targetForward });
     keysTorus.push({ frame: 120, value: targetForward });
-    keysTorus.push({ frame: 180, value: object.position });
+    keysTorus.push({ frame: 180, value: new BABYLON.Vector3(object.position.x, object.position.y, object.position.z+1) });
     animationForward.setKeys(keysTorus);
 
     // Adding an easing function
@@ -96,6 +96,7 @@ function AnimationMoveForward(targetForward, duration)
     animationForward.addEvent(eventStopElectric);
 
     //Finally, launch animations on object, from key 0 to key 120 with loop activated
+    AnimationRotationSymbol.call(object, 120);
     var anim = scene.beginAnimation(object, 0, 180, false, duration);
 
     return anim;

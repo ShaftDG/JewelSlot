@@ -24,9 +24,9 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [  0 ,  25 ,  100 , 1000 , 5000 ], // SYMB_Square
         [  0 ,  25 ,   50 ,  200 ,  500 ], // SYMB_Diamond
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Pad
+        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Octa
+        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Coin
         [  0 ,  0 ,   0 ,  0 ,  0 ], // SYMB_PartMap
-        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Bell
-        [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Coins
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Horseshoe
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Crown
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Clover
@@ -35,7 +35,7 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [  0 ,  25 ,   50 ,  100 ,  200 ], // SYMB_Strawberry
     ];
 
-    this.freeSpinSymb = 3;
+    this.freeSpinSymb = 5;
     this.numFreeSpinSymb = 0;
     this.numFreeSpin = 0;
     this.isFreeSpin = false;
@@ -57,11 +57,11 @@ function  GenerateWinCombination(numCilinder, numPlayingSymbPerCilinder, totalSy
         [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ]
     ];*/
     this.r = [
-        [ 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 3, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0 ],
-        [ 1, 0, 2, 3, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1 ],
-        [ 2, 0, 1, 3, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2 ],
-        [ 0, 1, 3, 2, 0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 3, 1, 0, 2, 0, 1, 0, 2, 0 ],
-        [ 1, 0, 1, 0, 2, 0, 2, 3, 1, 3, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1 ]
+        [ 0, 2, 4, 1, 0, 2, 5, 4, 0, 4, 3, 1, 5, 2, 0, 1, 4, 2, 3, 5, 0, 2, 4, 1, 0 ],
+        [ 1, 0, 5, 3, 4, 0, 2, 5, 2, 3, 4, 0, 1, 5, 2, 4, 1, 0, 4, 5, 1, 0, 4, 0, 2 ],
+        [ 2, 4, 1, 5, 2, 0, 4, 3, 5, 0, 1, 4, 2, 3, 1, 5, 2, 4, 1, 5, 2, 0, 1, 4, 2 ],
+        [ 0, 1, 4, 2, 0, 1, 5, 4, 0, 1, 3, 4, 0, 1, 0, 2, 5, 1, 0, 2, 0, 1, 0, 2, 0 ],
+        [ 1, 4, 1, 0, 2, 4, 2, 3, 1, 3, 4, 0, 2, 0, 2, 5, 1, 5, 1, 0, 2, 4, 2, 0, 1 ]
     ];
 
     this.arrayCombination = [];
