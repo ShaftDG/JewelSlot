@@ -46,6 +46,19 @@ if (BABYLON.Engine.isSupported()) {
             }
         });*/
 
+        var skybox = BABYLON.MeshBuilder.CreateSphere("sphere2", {
+            diameterX: 2000,
+            diameterY: 2000,
+            diameterZ: 2000,
+            sideOrientation: BABYLON.Mesh.BACKSIDE
+        }, scene);
+        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new BABYLON.Texture("textures/111.jpg", scene, true);
+        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.FIXED_EQUIRECTANGULAR_MODE;
+        skyboxMaterial.disableLighting = true;
+        skybox.material = skyboxMaterial;
+
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
         var hdrTexture1 = new BABYLON.HDRCubeTexture("textures/mutianyu_1k.hdr", scene, 512, false, false) ;
@@ -76,6 +89,7 @@ if (BABYLON.Engine.isSupported()) {
         var freeSpin = new TextLabel( new BABYLON.Vector3(-23, 0, 0), scene, 300, {height:0.45*8, width: 0.5*8});
         freeSpin.setOnOff(false);
 // spider web
+        var brightness = new BABYLON.Vector3(0.75,0.75,0.75);
         var planeSpiderWeb = BABYLON.MeshBuilder.CreatePlane("planeSpiderWeb", {height:0.75, width: 1.0/*, sideOrientation: BABYLON.Mesh.DOUBLESIDE*/}, scene);
         planeSpiderWeb.rotation.y = Math.PI / 2;
         planeSpiderWeb.rotation.x = 0.05;
@@ -83,6 +97,7 @@ if (BABYLON.Engine.isSupported()) {
         planeSpiderWeb.position.y = 0.34;
         var materialSpiderWeb = new BABYLON.StandardMaterial("materialSpiderWeb", scene);
         materialSpiderWeb.diffuseTexture = new BABYLON.Texture("textures/spiderweb/web.png", scene);
+        materialSpiderWeb.diffuseColor = brightness;
         materialSpiderWeb.opacityTexture = materialSpiderWeb.diffuseTexture;
         planeSpiderWeb.material = materialSpiderWeb;
 
@@ -92,6 +107,7 @@ if (BABYLON.Engine.isSupported()) {
         var textureWeb1 = new BABYLON.Texture("textures/spiderweb/web1.png", scene);
         var materialSpiderWeb1 = new BABYLON.StandardMaterial("materialSpiderWeb1", scene);
         materialSpiderWeb1.diffuseTexture = textureWeb1.clone();
+        materialSpiderWeb1.diffuseColor = brightness;
         materialSpiderWeb1.opacityTexture = materialSpiderWeb1.diffuseTexture;
         planeSpiderWeb1.material = materialSpiderWeb1;
 
@@ -104,6 +120,7 @@ if (BABYLON.Engine.isSupported()) {
         planeSpiderWeb2.rotation.z = -0.0872664626;
         var materialSpiderWeb2 = new BABYLON.StandardMaterial("materialSpiderWeb2", scene);
         materialSpiderWeb2.diffuseTexture =  new BABYLON.Texture("textures/spiderweb/web2.png", scene);
+        materialSpiderWeb2.diffuseColor = brightness;
         materialSpiderWeb2.opacityTexture = materialSpiderWeb2.diffuseTexture;
         planeSpiderWeb2.material = materialSpiderWeb2;
 
@@ -113,6 +130,7 @@ if (BABYLON.Engine.isSupported()) {
         planeSpiderWeb3.scaling = new BABYLON.Vector3(-1,1,1);
         var materialSpiderWeb3 = new BABYLON.StandardMaterial("materialSpiderWeb3", scene);
         materialSpiderWeb3.diffuseTexture = textureWeb1.clone();
+        materialSpiderWeb3.diffuseColor = brightness;
         materialSpiderWeb3.opacityTexture = materialSpiderWeb3.diffuseTexture;
         planeSpiderWeb3.material = materialSpiderWeb3;
 

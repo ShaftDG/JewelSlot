@@ -106,21 +106,29 @@ function CreateJewel(renderList, textures, position, isMobile)
                 noiseTexture: textures[1],
                 gradientTexture: textures[2]
             };
-        } else if (v.name !== this.name + "." + "coin") {
+        } else if (
+            v.name !== this.name + "." + "coin" &&
+            v.name !== this.name + "." + "bottle" &&
+            v.name !== this.name + "." + "ring"
+        ) {
             v.particleSystem = FireParticles(v);
             v.material = glassMaterial.clone();
             v.material.albedoColor = new BABYLON.Color3(0, 0, 0);
-            if (i+1 === 1) {
+            if (i === 2) {
                 v.material.albedoColor.r = 2.0;
-            } else if (i+1 === 2) {
+            } else if (i === 3) {
                 v.material.albedoColor.g = 2.0;
-            } else if (i+1 === 3) {
+            } else if (i === 4) {
                 v.material.albedoColor.b = 2.0;
-            }  else if (i+1 === 4) {
+            }  else if (i === 5) {
                 v.material.albedoColor.b = 2.0;
                 v.material.albedoColor.g = 1.0;
             }
-        } else {
+        }/* else if (v.name === this.name + "." + "ring") {
+            v.particleSystem = FireParticles(v);
+            v._children[0].material = glassMaterial.clone();
+            v.material.albedoColor = new BABYLON.Color3(0, 1.0, 2.0);
+        }*/ else {
             v.particleSystem = FireParticles(v);
             v.material.reflectionTexture = textures[0];
             v.material.environmentIntensity = 2.0;
