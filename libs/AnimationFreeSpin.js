@@ -145,6 +145,10 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
         } else {
             partMap.particleSystem.start();
         }
+        if (object._children[10].particleSystem) {
+            object._children[10].particleSystem.start(30);
+        }
+
     });
 // Attach your event to your animation
     animationEmissive.addEvent(eventStartFire);

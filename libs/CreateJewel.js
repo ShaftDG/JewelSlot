@@ -106,9 +106,21 @@ function CreateJewel(renderList, textures, position, isMobile)
                 noiseTexture: textures[1],
                 gradientTexture: textures[2]
             };
+          /*  var box = BABYLON.MeshBuilder.CreateBox("box", {width: 3, height: 3, depth: 3}, scene);
+            box.visibility = this.visibility;
+            var mat = new BABYLON.StandardMaterial("mat", scene);
+            mat.emissiveColor = new BABYLON.Color3(0.75,0.5,0.25);
+            box.convertToFlatShadedMesh();
+            box.enableEdgesRendering();
+            box.edgesColor.copyFromFloats(0, 0, 0, 1);
+            box.edgesWidth = 0.2;
+            box.material = mat;
+            box.parent = v;*/
+
         } else if (
             v.name !== this.name + "." + "coin" &&
             v.name !== this.name + "." + "bottle" &&
+            v.name !== this.name + "." + "cube" &&
             v.name !== this.name + "." + "ring"
         ) {
             v.particleSystem = FireParticles(v);
@@ -132,10 +144,15 @@ function CreateJewel(renderList, textures, position, isMobile)
             v.particleSystem = FireParticles(v);
             v.material.reflectionTexture = textures[0];
             v.material.environmentIntensity = 2.0;
+            if (v.name === this.name + "." + "cube" ) {
+                v.particleSystem = FireBlast(v);
+                v.material = glassMaterial.clone();
+                v.material.emissiveColor = new BABYLON.Color3(2.0,2.0,2.0);
+            }
         }
     });
     this.userData = {
-        beginGame: true,
+        beginGame: false,
         speedMove: null,
         rotateDestination: null,
         // flagDestination: false,

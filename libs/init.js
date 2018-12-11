@@ -46,7 +46,7 @@ if (BABYLON.Engine.isSupported()) {
             }
         });*/
 
-        var skybox = BABYLON.MeshBuilder.CreateSphere("sphere2", {
+      /*  var skybox = BABYLON.MeshBuilder.CreateSphere("sphere2", {
             diameterX: 2000,
             diameterY: 2000,
             diameterZ: 2000,
@@ -57,7 +57,7 @@ if (BABYLON.Engine.isSupported()) {
         skyboxMaterial.reflectionTexture = new BABYLON.Texture("textures/111.jpg", scene, true);
         skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.FIXED_EQUIRECTANGULAR_MODE;
         skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;
+        skybox.material = skyboxMaterial;*/
 
         var texturesJewel = [];
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
@@ -243,11 +243,14 @@ if (BABYLON.Engine.isSupported()) {
                             v.particleSystem.electric.stop();
                             v.particleSystem.spark.reset();
                             v.particleSystem.spark.stop();
-                        } else {
+                        } else if (v.name !== obj.name + "." + "cube") {
                             v.particleSystem.flame.reset();
                             v.particleSystem.flame.stop();
                             v.particleSystem.origin.reset();
                             v.particleSystem.origin.stop();
+                        } else {
+                            v.particleSystem.reset();
+                            v.particleSystem.stop();
                         }
 
                         v.scaling = new BABYLON.Vector3(1,1,1);
@@ -323,6 +326,7 @@ if (BABYLON.Engine.isSupported()) {
                                     } else {
                                         obj._children[arr[j][h]+numberPartMap].visibility = true;
                                         numberPartMap < 2 ? numberPartMap++ : numberPartMap = 0;
+                                        obj._children[10].visibility = true;
                                     }
                                 } else {
                                     if (genCombination.moveArray[i][j][h] === 1) {
@@ -740,6 +744,7 @@ if (BABYLON.Engine.isSupported()) {
                         var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
                         DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0));
                         mapAllSymbol.set(j + "-" + i, obj);
+                        obj.userData.beginGame = true;
                     }
                 }
 

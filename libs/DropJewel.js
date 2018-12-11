@@ -8,32 +8,11 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
 
     scene.registerBeforeRender(function () {
        /* if (object.userData.beginGame) {
-            if (!object.userData.flagStartTween) {
-                animation = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
+            var animationStart = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
+            animationStart.onAnimationEnd = function () {
                 object.userData.beginGame = false;
-            } else {
-                animation.onAnimationEnd = function () {
-                    animation.animationStarted = false;
-                    object.userData.startDrop = false;
-                    endDrop = true;
-                    if (!object.userData.scalingDown) {
-                        object._children.map(v => {
-                            if (v.visibility) {
-                                if (v.particleSystem.spark) {
-                                    v.particleSystem.spark.start();
-                                    AnimationRotationPartMap.call(object, 60);
-                                }
-                            } else {
-                                if (v.particleSystem.spark) {
-                                    v.particleSystem.spark.reset();
-                                    v.particleSystem.spark.stop();
-                                }
-                            }
-                        });
-                    }
-                }
             }
-        } else */if (object.userData.startDrop) {
+        } else*/ if (object.userData.startDrop) {
                 if (!object.userData.flagStartTween) {
                     animation = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
                     object.userData.flagStartTween = true;
@@ -96,6 +75,11 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
                 animationEmissive.animationStarted = false;
             };
 
+            var animationCubeScaling = AnimationScalingDown.call(object._children[10], new BABYLON.Vector3(0,0,0), 60);
+            animationCubeScaling.onAnimationEnd = function () {
+                object._children[10].scaling = new BABYLON.Vector3(1, 1, 1);
+                object._children[10].visibility = false;
+            };
             animationFreeSpin = AnimationFreeSpin.call(object, pointsFreeSpinObject, new BABYLON.Vector3(0, 2, 10), 30);
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {

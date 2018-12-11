@@ -1,7 +1,7 @@
 function FireParticles(emitter, inOptions) {
     var options = inOptions || {
       sizeParticle: 4.5,
-      countParticles: 20
+      countParticles: 14
     };
     var particleSystemFire = new BABYLON.ParticleSystem("particles", 100, scene, null, true);
 
