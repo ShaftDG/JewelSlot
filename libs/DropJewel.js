@@ -1,4 +1,4 @@
-function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationDown) {
+function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationDown, sounds) {
     var object = this;
 
     var durationPosition = 60;
@@ -16,6 +16,7 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
                 if (!object.userData.flagStartTween) {
                     animation = AnimationDrop.call(object, positionDestinationDown, object.userData.rotateDestination, durationPosition);
                     object.userData.flagStartTween = true;
+                    sounds.soundDrop.play();
                 } else {
                     animation.onAnimationEnd = function () {
                         animation.animationStarted = false;
@@ -54,7 +55,7 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
                 }
         } else if (object.userData.inChest && dropInChest) {
                 scene.stopAnimation(object);
-                animationInChest = AnimationMoveInChest.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60);
+                animationInChest = AnimationMoveInChest.call(object, new BABYLON.Vector3(object.position.x, -25, -20), 60, sounds.inChestSound);
                 object.userData.inChest = false;
                 animationInChest.onAnimationEnd = function () {
                     animationInChest.animationStarted = false;
@@ -79,8 +80,14 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
             animationCubeScaling.onAnimationEnd = function () {
                 object._children[10].scaling = new BABYLON.Vector3(1, 1, 1);
                 object._children[10].visibility = false;
+                if (!sounds.freeSpinSound.isPlaying) {
+                    sounds.freeSpinSound.play();
+                }
             };
-            animationFreeSpin = AnimationFreeSpin.call(object, pointsFreeSpinObject, new BABYLON.Vector3(0, 2, 10), 30);
+            animationFreeSpin = AnimationFreeSpin.call(object, pointsFreeSpinObject, new BABYLON.Vector3(0, 2, 10), 30, sounds.fireballSound);
+            if (!sounds.mapSound.isPlaying) {
+                sounds.mapSound.play();
+            }
             object.userData.inFreeSpin = false;
             animationFreeSpin.onAnimationEnd = function () {
                 startAnimationCharacter = true;

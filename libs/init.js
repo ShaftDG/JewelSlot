@@ -207,6 +207,25 @@ if (BABYLON.Engine.isSupported()) {
         // defaultPipeline.grainEnabled = true;
         // defaultPipeline.grain.intensity = 5;
         // defaultPipeline.grain.animated = true;
+////////////////// SOUNDS
+        var introSound = new BABYLON.Sound("introSound", "sounds/intro.mp3", scene);
+        introSound.setVolume(0.75);
+        var openChestSound = new BABYLON.Sound("openChestSound", "sounds/open_chest.mp3", scene);
+        openChestSound.setVolume(0.5);
+        var clickButtonSound = new BABYLON.Sound("clickButtonSound", "sounds/button_click.mp3", scene);
+        clickButtonSound.setVolume(0.25);
+        var dropSymbolsSound = new BABYLON.Sound("dropSymbolsSound", "sounds/drop.mp3", scene);
+        dropSymbolsSound.setVolume(0.025);
+        var freeSpinSound = new BABYLON.Sound("freeSpinSound", "sounds/freespin.mp3", scene);
+      //  freeSpinSound.setVolume(0.75);
+        var winSound = new BABYLON.Sound("winSound", "sounds/win.mp3", scene);
+        winSound.setVolume(0.15);
+        var inChestSound = new BABYLON.Sound("inChestSound", "sounds/inChest.mp3", scene);
+        inChestSound.setVolume(0.5);
+        var mapSound = new BABYLON.Sound("mapSound", "sounds/map.mp3", scene);
+        mapSound.setVolume(0.5);
+        var fireballSound = new BABYLON.Sound("fireballSound", "sounds/fireball.mp3", scene);
+        fireballSound.setVolume(0.5);
 ////////////////////////////////////////////////////
         var manager = new BABYLON.GUI.GUI3DManager(scene);
         var countRow = 3;
@@ -358,6 +377,9 @@ if (BABYLON.Engine.isSupported()) {
         var plusLineButton, minusLineButton;
         var plusLineObservable = function () {
             if (!genCombination.numFreeSpin) {
+                if (plusLineButton.enabled) {
+                    clickButtonSound.play();
+                }
                 genCombination.toIncreaseLines();
                 lines.setTextForAnimation(genCombination.winLineNum.toString());
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
@@ -369,6 +391,9 @@ if (BABYLON.Engine.isSupported()) {
         };
         var minusLineObservable = function () {
             if (!genCombination.numFreeSpin) {
+                if (minusLineButton.enabled) {
+                    clickButtonSound.play();
+                }
                 genCombination.reduceLines();
                 lines.setTextForAnimation(genCombination.winLineNum.toString());
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
@@ -382,6 +407,7 @@ if (BABYLON.Engine.isSupported()) {
 
         var maxBetButtonObservable = function () {
             if (!genCombination.numFreeSpin) {
+                clickButtonSound.play();
                 genCombination.setMaxBet();
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 unEnableButton(plusBetButton);
@@ -390,6 +416,9 @@ if (BABYLON.Engine.isSupported()) {
         };
         var plusBetButtonObservable = function () {
             if (!genCombination.numFreeSpin) {
+                if (plusBetButton.enabled) {
+                    clickButtonSound.play();
+                }
                 genCombination.toIncreaseBet();
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 /* genCombination.toIncreaseLines();
@@ -402,6 +431,9 @@ if (BABYLON.Engine.isSupported()) {
         };
         var minusBetButtonObservable = function () {
             if (!genCombination.numFreeSpin) {
+                if (minusBetButton.enabled) {
+                    clickButtonSound.play();
+                }
                 genCombination.reduceBet();
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 /*  genCombination.reduceLines();
@@ -612,6 +644,7 @@ if (BABYLON.Engine.isSupported()) {
            var startButton = MakeButton("startButton", newMeshes[1], newMeshes[12], optionStartButton, manager);
 
             startButton.onPointerUpObservable.add(function () {
+                clickButtonSound.play();
                 endScaling = false;
                 genCombination.gettingWinnings();
                 roundScore.zeroing();
@@ -679,6 +712,7 @@ if (BABYLON.Engine.isSupported()) {
 
             var autoPlayButton = MakeButton("autoPlayButton", newMeshes[5], newMeshes[14], optionSecondButton, manager);
             autoPlayButton.onPointerUpObservable.add(function () {
+                clickButtonSound.play();
                 autoPlay = !autoPlay;
                 if (autoPlay) {
                     autoPlayButton.mesh.material.emissiveColor = new BABYLON.Color3(0.5,0.25,0.125);
@@ -723,9 +757,9 @@ if (BABYLON.Engine.isSupported()) {
             });
 
             BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
-                newMeshes[0]._children.map(v => {
+               /* newMeshes[0]._children.map(v => {
                     console.log(v.name);
-                });
+                });*/
                 var box = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 0.1}, scene);
                 box.visibility = false;
                 box.position = new BABYLON.Vector3(-0.75, 4.2, 9.0);
@@ -742,7 +776,15 @@ if (BABYLON.Engine.isSupported()) {
                         var mesh = newMeshes[0].clone(j + "-" + i);
                         mesh.scaling = new BABYLON.Vector3(0.001, 0.001, 0.001);
                         var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
-                        DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0));
+                        DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0),
+                            {
+                                soundDrop: dropSymbolsSound,
+                                freeSpinSound: freeSpinSound,
+                                inChestSound: inChestSound,
+                                mapSound: mapSound,
+                                fireballSound: fireballSound
+                            }
+                        );
                         mapAllSymbol.set(j + "-" + i, obj);
                         obj.userData.beginGame = true;
                     }
@@ -832,7 +874,8 @@ if (BABYLON.Engine.isSupported()) {
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
                 lines.setTextForAnimation(genCombination.winLineNum.toString());
                 freeSpin.setTextForAnimation(genCombination.numFreeSpin.toString());
-
+                introSound.play();
+                openChestSound.play();
                 scene.animationGroups.map(v => {
                     animationGroupPirate[v.name] = v;
                     animationGroupPirate[v.name].freeAnimation = true;
@@ -935,6 +978,9 @@ if (BABYLON.Engine.isSupported()) {
                             objWineline.setEnabled(true);
                             enableColorCheckLine(objCheckLine);
                             mapObjs.array.map(v =>{
+                                if (!winSound.isPlaying) {
+                                    winSound.play();
+                                }
                                 var animation = AnimationMoveForward.call(v, new BABYLON.Vector3(v.position.x, v.position.y, 5), 60);
                                 animation.onAnimationEnd = function () {
                                     animation.animationStarted = false;

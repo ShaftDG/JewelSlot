@@ -135,14 +135,14 @@ function FireParticles(emitter, inOptions) {
     var fireEmitter = new BABYLON.TransformNode("");
     fireEmitter.parent = emitter;
     fireEmitter.position.y -= 2.3;
-    fireEmitter.position.z += 0.7;
+    fireEmitter.position.z += 0.5;
     //fireEmitter.position.z += 2.0;
     particleSystemFireOrigin.emitter = fireEmitter; // the starting object, the emitter
     // var emitterType = new BABYLON.SphereParticleEmitter();
     // emitterType.radius = 2.25;
     // particleSystemFireOrigin.particleEmitterType = emitterType;
 
-    particleSystemFireOrigin.createCylinderEmitter(1.4,0.1,0,0);
+    particleSystemFireOrigin.createCylinderEmitter(1.0,0.1,0,0);
 
     particleSystemFireOrigin.startSpriteCellID = 0;
     particleSystemFireOrigin.endSpriteCellID = 31;

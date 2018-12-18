@@ -1,4 +1,4 @@
-function AnimationMoveInChest(targetBackward, duration)
+function AnimationMoveInChest(targetBackward, duration, inChestSound)
 {
     var object = this;
 
@@ -70,8 +70,13 @@ function AnimationMoveInChest(targetBackward, duration)
     object.animations.push(animationBackward);
     object.animations.push(animationRotation);
 
-    //Finally, launch animations on object, from key 0 to key 120 with loop activated
+    var eventSound = new BABYLON.AnimationEvent(55, function() {
+        inChestSound.play();
+    }, true);
+    // Attach your event to your animation
+    animationBackward.addEvent(eventSound);
 
+    //Finally, launch animations on object, from key 0 to key 120 with loop activated
     var anim = scene.beginAnimation(object, 0, 60, false, duration);
     return anim;
 };

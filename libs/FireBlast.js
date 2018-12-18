@@ -1,7 +1,7 @@
 function FireBlast(emitter)
 {
     // Create default particle systems
-    var fireBlast = BABYLON.ParticleHelper.CreateDefault(emitter.position.clone(), 250);
+    var fireBlast = BABYLON.ParticleHelper.CreateDefault(emitter.position.clone(), 500);
 
     // Emitter
     fireBlast.emitter = emitter;

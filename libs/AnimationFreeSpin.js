@@ -1,4 +1,4 @@
-function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
+function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration, fireballSound)
 {
     var object = this;
 
@@ -167,6 +167,7 @@ function AnimationFreeSpin(pointsFreeSpinObject, targetForward, duration)
     animationEmissive.addEvent(eventStopFire);
 
     var eventFireBall = new BABYLON.AnimationEvent(70, function() {
+        fireballSound.play();
         pointsFreeSpinObject.box.visibility = true;
         var animation = AnimationPointsFreeSpin.call(pointsFreeSpinObject.box, pointsFreeSpinObject, 40);
         pointsFreeSpinObject.box.userData.particles.start();
