@@ -36,6 +36,7 @@ function WinLines(options, scene) {
         // line.renderingGroupId = 1;
         arrayObjectLines = [...arrayObjectLines, line];
         line.setEnabled(false);
+        // line.renderingGroupId = 0;
     }
     return arrayObjectLines;
 }

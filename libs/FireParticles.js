@@ -134,15 +134,15 @@ function FireParticles(emitter, inOptions) {
     // Where the particles come from
     var fireEmitter = new BABYLON.TransformNode("");
     fireEmitter.parent = emitter;
-    fireEmitter.position.y -= 2.3;
+    fireEmitter.position.y -= 2.5;
     fireEmitter.position.z += 0.5;
-    //fireEmitter.position.z += 2.0;
+
     particleSystemFireOrigin.emitter = fireEmitter; // the starting object, the emitter
     // var emitterType = new BABYLON.SphereParticleEmitter();
     // emitterType.radius = 2.25;
     // particleSystemFireOrigin.particleEmitterType = emitterType;
 
-    particleSystemFireOrigin.createCylinderEmitter(1.0,0.1,0,0);
+    particleSystemFireOrigin.createCylinderEmitter(1.2,0.1,0,0);
 
     particleSystemFireOrigin.startSpriteCellID = 0;
     particleSystemFireOrigin.endSpriteCellID = 31;
@@ -223,6 +223,23 @@ function FireParticles(emitter, inOptions) {
     particleSystemFireOrigin.maxEmitPower = 0;
     particleSystemFireOrigin.updateSpeed = 0.04;
     particleSystemFireOrigin.targetStopDuration = 2.5;
+
+    //change start position function
+  /*  var walkPS = 0;
+    var meshModelVertices = emitter.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    particleSystemFireOrigin.startPositionFunction = function (worldMatrix, positionToUpdate, particle) {
+
+        var randX = meshModelVertices[walkPS]*0.8;
+        var randY = meshModelVertices[walkPS + 1];
+        var randZ = meshModelVertices[walkPS + 2]*1.05;
+
+        BABYLON.Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
+
+        walkPS += 3;
+        if (walkPS > meshModelVertices.length) {
+            walkPS = 0;
+        }
+    };*/
 
     return {flame: particleSystemFire, origin: particleSystemFireOrigin};
 }

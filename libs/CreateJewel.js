@@ -117,10 +117,11 @@ function CreateJewel(renderList, textures, position, isMobile)
             box.material = mat;
             box.parent = v;*/
 
-        } else if (
+        } /*else if (
             v.name !== this.name + "." + "coin" &&
             v.name !== this.name + "." + "bottle" &&
             v.name !== this.name + "." + "cube" &&
+            v.name !== this.name + "." + "diamond" &&
             v.name !== this.name + "." + "ring"
         ) {
             v.particleSystem = FireParticles(v);
@@ -136,18 +137,49 @@ function CreateJewel(renderList, textures, position, isMobile)
                 v.material.albedoColor.b = 2.0;
                 v.material.albedoColor.g = 1.0;
             }
-        }/* else if (v.name === this.name + "." + "ring") {
+        }*//* else if (v.name === this.name + "." + "ring") {
             v.particleSystem = FireParticles(v);
             v._children[0].material = glassMaterial.clone();
             v.material.albedoColor = new BABYLON.Color3(0, 1.0, 2.0);
         }*/ else {
+          //  v.renderingGroupId = 0;
             v.particleSystem = FireParticles(v);
-            v.material.reflectionTexture = textures[0];
-            v.material.environmentIntensity = 2.0;
+          //  v.material.backFaceCulling = false;
+         //   v.material.separateCullingPass = true;
+         //    v.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
+            // v.material.reflectionTexture = textures[0];
+            // v.material.refractionTexture = textures[0];
+            // v.material.linkRefractionWithTransparency = true;
+            //v.material.environmentIntensity = 2.0;
+          //  v.material.indexOfRefraction = 0.1;
+          //  v.material.alpha = 0.9;
+          /*  v.material.reflectivityColor = new BABYLON.Color3(0.25, 0.25, 0.25);
+            v.material.reflectionFresnelParameters = new BABYLON.FresnelParameters();
+            v.material.reflectionFresnelParameters.bias = 0.16;
+            v.material.reflectionFresnelParameters.power = 8;
+
+            v.material.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+            v.material.emissiveFresnelParameters.bias = 0.16;
+            v.material.emissiveFresnelParameters.power = 8;
+            v.material.emissiveFresnelParameters.leftColor = BABYLON.Color3.White();
+            v.material.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
+
+            v.material.opacityFresnelParameters = new BABYLON.FresnelParameters();
+            v.material.opacityFresnelParameters.leftColor = BABYLON.Color3.White();
+            v.material.opacityFresnelParameters.rightColor = BABYLON.Color3.Black();*/
+
             if (v.name === this.name + "." + "cube" ) {
                 v.particleSystem = FireBlast(v);
                 v.material = glassMaterial.clone();
-                v.material.emissiveColor = new BABYLON.Color3(2.0,2.0,2.0);
+                //v.material.emissiveColor = new BABYLON.Color3(2.0,2.0,2.0);
+            }
+            if (
+                v.name === this.name + "." + "octa" &&
+                v.name === this.name + "." + "square" &&
+                v.name === this.name + "." + "pad" &&
+                v.name === this.name + "." + "diamond"
+            ) {
+                v.material.emissiveColor = new BABYLON.Color3(0.5,0.5,0.5);
             }
         }
     });

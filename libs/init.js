@@ -255,8 +255,9 @@ if (BABYLON.Engine.isSupported()) {
                             v.position = new BABYLON.Vector3(0,0,0).subtract(center);
                             v.rotation.z = (Math.random() < 0.5 ? -1 : 1) * Math.PI / 15;
                             v.material = v.userData.defaultMaterial;
+                            v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
                         }
-                        v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+
                         if (v.particleSystem.electric) {
                             v.particleSystem.electric.reset();
                             v.particleSystem.electric.stop();
@@ -461,6 +462,14 @@ if (BABYLON.Engine.isSupported()) {
         // scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
         // scene.animationPropertiesOverride.enableBlending = true;
         // scene.animationPropertiesOverride.blendingSpeed = 0.05;
+
+        var gl = new BABYLON.GlowLayer("glow", scene, {
+            mainTextureRatio: 0.5,
+            //   mainTextureSamples: 1,
+            //   mainTextureFixedSize: 512,
+            blurKernelSize: 8
+        });
+        gl.intensity = 0.65;
 
         BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
             if (plugin.name === "gltf" && plugin instanceof BABYLON.GLTFFileLoader) {
@@ -764,9 +773,11 @@ if (BABYLON.Engine.isSupported()) {
                 box.visibility = false;
                 box.position = new BABYLON.Vector3(-0.75, 4.2, 9.0);
                 var fireBall = FireBall(box);
+                var explodeFireBall = FireBlast(freeSpin.anchor);
                 box.userData = {
                     beginPosition: box.position.clone(),
-                    particles: fireBall
+                    particles: fireBall,
+                    explodeFireBall: explodeFireBall
                 };
 
                 for (var i = 0; i < countRow; i++) {
@@ -1092,13 +1103,6 @@ if (BABYLON.Engine.isSupported()) {
                     }
                 }
             });
-            var gl = new BABYLON.GlowLayer("glow", scene, {
-                mainTextureRatio: 0.5,
-                //   mainTextureSamples: 1,
-                //   mainTextureFixedSize: 512,
-                blurKernelSize: 8
-            });
-            gl.intensity = 0.65;
     });
 ///////////////////////////////////
        // Lightning(scene);

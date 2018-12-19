@@ -89,6 +89,7 @@ function AnimationPointsFreeSpin(pointsFreeSpinObject, duration)
         OpenChest.call(pointsFreeSpinObject.freeSpin.compass.arrow, new BABYLON.Vector3(0,0,Math.PI*6), 15);
 
         pointsFreeSpinObject.box.userData.particles.stop();
+        pointsFreeSpinObject.box.userData.explodeFireBall.start();
     }, true);
     // Attach your event to your animation
     animationBackward.addEvent(eventSetVisible);
