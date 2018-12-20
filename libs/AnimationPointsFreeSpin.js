@@ -74,7 +74,7 @@ function AnimationPointsFreeSpin(pointsFreeSpinObject, duration)
     var eventSetOpenCompass = new BABYLON.AnimationEvent(0, function() {
 
         pointsFreeSpinObject.freeSpin.compass.arrow.rotation = BABYLON.Vector3.Zero();
-        OpenChest.call(pointsFreeSpinObject.freeSpin.compass.cup, new BABYLON.Vector3(0,Math.PI*0.6,0), 30);
+        OpenChest.call(pointsFreeSpinObject.freeSpin.compass.cup, new BABYLON.Vector3(0,Math.PI*0.5,0), 30);
 
     }, true);
     // Attach your event to your animation

@@ -1,4 +1,4 @@
-function CreateJewel(renderList, textures, position, isMobile)
+function CreateJewel(renderList, textures, position, glow, isMobile)
 {
    /* var glassMaterial = new BABYLON.PBRMaterial("glassMaterial", scene);
     glassMaterial.backFaceCulling = false;
@@ -83,7 +83,6 @@ function CreateJewel(renderList, textures, position, isMobile)
     // partMap.parent = this;
 
     this._children.map((v,i) => {
-        v.material.emissiveIntensity = 5.0;
         if (
             v.name === this.name + "." + "map_1" ||
             v.name === this.name + "." + "map_2" ||
@@ -91,6 +90,7 @@ function CreateJewel(renderList, textures, position, isMobile)
         ) {
             v.material.albedoColor = new BABYLON.Color3(1.5, 1.5, 1.5);
             v.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            v.material.emissiveIntensity = 5.0;
             var center = v.getBoundingInfo().boundingBox.center;
             v.setPivotMatrix(BABYLON.Matrix.Translation(-center.x, -center.y, -center.z));
             v.position = new BABYLON.Vector3(0,0,0).subtract(center);
@@ -142,18 +142,19 @@ function CreateJewel(renderList, textures, position, isMobile)
             v._children[0].material = glassMaterial.clone();
             v.material.albedoColor = new BABYLON.Color3(0, 1.0, 2.0);
         }*/ else {
-          //  v.renderingGroupId = 0;
+            // glow.addExcludedMesh(v);
+           // v.renderingGroupId = 1;
             v.particleSystem = FireParticles(v);
-          //  v.material.backFaceCulling = false;
-         //   v.material.separateCullingPass = true;
-         //    v.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
-            // v.material.reflectionTexture = textures[0];
-            // v.material.refractionTexture = textures[0];
-            // v.material.linkRefractionWithTransparency = true;
-            //v.material.environmentIntensity = 2.0;
-          //  v.material.indexOfRefraction = 0.1;
-          //  v.material.alpha = 0.9;
-          /*  v.material.reflectivityColor = new BABYLON.Color3(0.25, 0.25, 0.25);
+            // v.material.backFaceCulling = false;
+            // v.material.separateCullingPass = true;
+            // v.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
+            v.material.environmentIntensity = 2.0;
+            v.material.reflectionTexture = textures[0];
+           /* v.material.refractionTexture = textures[0];
+            v.material.linkRefractionWithTransparency = true;
+            v.material.indexOfRefraction = 0.1;
+            v.material.alpha = 0;
+            v.material.reflectivityColor = new BABYLON.Color3(0.25, 0.25, 0.25);
             v.material.reflectionFresnelParameters = new BABYLON.FresnelParameters();
             v.material.reflectionFresnelParameters.bias = 0.16;
             v.material.reflectionFresnelParameters.power = 8;
@@ -179,7 +180,9 @@ function CreateJewel(renderList, textures, position, isMobile)
                 v.name === this.name + "." + "pad" &&
                 v.name === this.name + "." + "diamond"
             ) {
-                v.material.emissiveColor = new BABYLON.Color3(0.5,0.5,0.5);
+                v.material.environmentIntensity = 3.0;
+                v.material.emissiveIntensity = 0.1;
+                v.material.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
             }
         }
     });

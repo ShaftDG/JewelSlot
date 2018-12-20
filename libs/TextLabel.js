@@ -46,8 +46,6 @@ TextLabel.prototype.setText = function (text) {
         this.arrayPlaneSymbols.map((value, index) => {
             value.plane.position.x = posX - index * this.distanceBetweenSymbol;
         });
-    } else {
-
     }
     this.arrayPlaneSymbols.map((value, index) => value.setSymbol(+arrayText[index]));
 };

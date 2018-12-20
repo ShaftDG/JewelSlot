@@ -75,7 +75,9 @@ function DropJewel(scene, pointsFreeSpinObject, pushButton, positionDestinationD
             animationEmissive.onAnimationEnd = function () {
                 animationEmissive.animationStarted = false;
             };
-
+            // if (!sounds.glassSound.isPlaying) {
+                sounds.glassSound.play();
+            // }
             var animationCubeScaling = AnimationScalingDown.call(object._children[10], new BABYLON.Vector3(0,0,0), 60);
             animationCubeScaling.onAnimationEnd = function () {
                 object._children[10].scaling = new BABYLON.Vector3(1, 1, 1);

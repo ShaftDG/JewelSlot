@@ -137,7 +137,7 @@ if (BABYLON.Engine.isSupported()) {
         var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 7, 43), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
-        camera.attachControl(canvas, false);
+        // camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
         camera.upperRadiusLimit = 50;
@@ -217,13 +217,15 @@ if (BABYLON.Engine.isSupported()) {
         var dropSymbolsSound = new BABYLON.Sound("dropSymbolsSound", "sounds/drop.mp3", scene);
         dropSymbolsSound.setVolume(0.025);
         var freeSpinSound = new BABYLON.Sound("freeSpinSound", "sounds/freespin.mp3", scene);
-      //  freeSpinSound.setVolume(0.75);
+        // freeSpinSound.setVolume(0.75);
         var winSound = new BABYLON.Sound("winSound", "sounds/win.mp3", scene);
         winSound.setVolume(0.15);
         var inChestSound = new BABYLON.Sound("inChestSound", "sounds/inChest.mp3", scene);
-        inChestSound.setVolume(0.5);
+        inChestSound.setVolume(0.2);
         var mapSound = new BABYLON.Sound("mapSound", "sounds/map.mp3", scene);
-        mapSound.setVolume(0.5);
+        // mapSound.setVolume(0.75);
+        var glassSound = new BABYLON.Sound("glassSound", "sounds/glass.mp3", scene);
+        glassSound.setVolume(0.3);
         var fireballSound = new BABYLON.Sound("fireballSound", "sounds/fireball.mp3", scene);
         fireballSound.setVolume(0.5);
 ////////////////////////////////////////////////////
@@ -509,6 +511,7 @@ if (BABYLON.Engine.isSupported()) {
             BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
                 newMeshes[0].position = freeSpin.anchor.position.clone();
+                newMeshes[0].position.x -= 0.3;
                 newMeshes[0].position.z -= 1.0;
                 newMeshes[0].rotation.y = 0.3;
                 freeSpin.anchor.rotation = newMeshes[0].rotation.clone();
@@ -786,13 +789,14 @@ if (BABYLON.Engine.isSupported()) {
                         var x = distanceBetweenSymbolRow * j - halfLengthRow;
                         var mesh = newMeshes[0].clone(j + "-" + i);
                         mesh.scaling = new BABYLON.Vector3(0.001, 0.001, 0.001);
-                        var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), false);
+                        var obj = CreateJewel.call(mesh, [], texturesJewel, new BABYLON.Vector3(-x, 70, 0), gl, false);
                         DropJewel.call(obj, scene, {box: box, freeSpin: freeSpin}, startButton, new BABYLON.Vector3(-x, -y, 0),
                             {
                                 soundDrop: dropSymbolsSound,
                                 freeSpinSound: freeSpinSound,
                                 inChestSound: inChestSound,
                                 mapSound: mapSound,
+                                glassSound: glassSound,
                                 fireballSound: fireballSound
                             }
                         );
