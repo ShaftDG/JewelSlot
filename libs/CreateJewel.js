@@ -98,7 +98,7 @@ function CreateJewel(renderList, textures, position, glow, isMobile)
             v.particleSystem = {
                 electric: ElectricField(v),
                 spark: StarBackground(v),
-                fire: FireParticlesCombustion(v, {sizeParticle: 8, countParticles: 4}),
+                fire: FireParticlesCombustion(v, {sizeParticle: 8, countParticles: 4, noiseTexture: textures[1]}),
             };
             v.userData = {
                 center: center,
@@ -175,14 +175,14 @@ function CreateJewel(renderList, textures, position, glow, isMobile)
                 //v.material.emissiveColor = new BABYLON.Color3(2.0,2.0,2.0);
             }
             if (
-                v.name === this.name + "." + "octa" &&
-                v.name === this.name + "." + "square" &&
-                v.name === this.name + "." + "pad" &&
+                v.name === this.name + "." + "octa" ||
+                v.name === this.name + "." + "square" ||
+                v.name === this.name + "." + "pad" ||
                 v.name === this.name + "." + "diamond"
             ) {
                 v.material.environmentIntensity = 3.0;
-                v.material.emissiveIntensity = 0.1;
-                v.material.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+                v.material.emissiveIntensity = 0.5;
+                // v.material.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
             }
         }
     });

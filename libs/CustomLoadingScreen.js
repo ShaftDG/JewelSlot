@@ -1,4 +1,4 @@
-function CustomLoadingScreen(url) {
+function CustomLoadingScreen() {
     /**     CONTAINER    **/
 
     this.containerLoader = document.getElementById("MyLoadingScreenContainer");

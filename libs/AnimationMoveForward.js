@@ -85,9 +85,9 @@ function AnimationMoveForward(targetForward, duration)
                 v.particleSystem.electric.reset();
                 v.particleSystem.electric.stop();
             } else if (v.name !== object.name + "." + "cube") {
-                v.particleSystem.flame.reset();
+                // v.particleSystem.flame.reset();
                 v.particleSystem.flame.stop();
-                v.particleSystem.origin.reset();
+                // v.particleSystem.origin.reset();
                 v.particleSystem.origin.stop();
             } else {
                 v.particleSystem.reset();

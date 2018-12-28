@@ -224,5 +224,7 @@ function FireParticlesCombustion(emitter, inOptions) {
     particleSystemFireOrigin.updateSpeed = 0.04;
     particleSystemFireOrigin.targetStopDuration = 0.4;
 
+   // console.log(inOptions.noiseTexture.readPixels());
+
     return {flame: particleSystemFire, origin: particleSystemFireOrigin};
 }

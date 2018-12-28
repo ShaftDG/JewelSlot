@@ -85,6 +85,16 @@ function FireParticles(emitter, inOptions) {
     // particleSystemFire.addColorRemapGradient(0.75, 0.65, 1.0);
     // particleSystemFire.addColorRemapGradient(1.0, 0.95, 1.0);
 
+    // Limit velocity over time
+    particleSystemFire.addLimitVelocityGradient(10, 15, 10);
+    particleSystemFire.addLimitVelocityGradient(0.120, 12.983, 0.25);
+    particleSystemFire.addLimitVelocityGradient(0.445, 1.780, 0.5);
+    particleSystemFire.addLimitVelocityGradient(0.691, 0.502, 0.75);
+    particleSystemFire.addLimitVelocityGradient(0.930, 0.05, 1.0);
+    particleSystemFire.addLimitVelocityGradient(1.0, 0, 1.25);
+
+    particleSystemFire.limitVelocityDamping = 1.0;
+
     // Emission rate
     particleSystemFire.emitRate = options.countParticles/2;
 
@@ -165,7 +175,9 @@ function FireParticles(emitter, inOptions) {
     particleSystemFireOrigin.addSizeGradient(0, options.sizeParticle, options.sizeParticle / 2);
     particleSystemFireOrigin.addSizeGradient(0.3, options.sizeParticle, options.sizeParticle / 2);
     particleSystemFireOrigin.addSizeGradient(0.4, options.sizeParticle * 0.72, (options.sizeParticle * 0.72)/2);
-    particleSystemFireOrigin.addSizeGradient(0.8, options.sizeParticle, options.sizeParticle/2);
+    particleSystemFireOrigin.addSizeGradient(0.6, options.sizeParticle*0.25, 0.25*options.sizeParticle/2);
+    particleSystemFireOrigin.addSizeGradient(0.7, options.sizeParticle*0.5, 0.5*options.sizeParticle/2);
+    particleSystemFireOrigin.addSizeGradient(0.9, 0, 0);
     // particleSystemFireOrigin.addSizeGradient(1.0, 2.4, 1.2);
     // particleSystemFireOrigin.addSizeGradient(1.0, 2.0, 1.0);
 
@@ -205,6 +217,16 @@ function FireParticles(emitter, inOptions) {
     // particleSystemFireOrigin.addColorRemapGradient(0.75, 0.65, 1.0);
     // particleSystemFireOrigin.addColorRemapGradient(1.0, 0.95, 1.0);
 
+    // Limit velocity over time
+    particleSystemFireOrigin.addLimitVelocityGradient(10, 15, 10);
+    particleSystemFireOrigin.addLimitVelocityGradient(0.120, 12.983, 0.25);
+    particleSystemFireOrigin.addLimitVelocityGradient(0.445, 1.780, 0.5);
+    particleSystemFireOrigin.addLimitVelocityGradient(0.691, 0.502, 0.75);
+    particleSystemFireOrigin.addLimitVelocityGradient(0.930, 0.05, 1.0);
+    particleSystemFireOrigin.addLimitVelocityGradient(1.0, 0, 1.25);
+
+    particleSystemFireOrigin.limitVelocityDamping = 0.95;
+
     // Emission rate
     particleSystemFireOrigin.emitRate = options.countParticles/2;
 
@@ -212,7 +234,7 @@ function FireParticles(emitter, inOptions) {
     particleSystemFireOrigin.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
 
     // Set the gravity of all particles
-    particleSystemFireOrigin.gravity = new BABYLON.Vector3(0, 0.25, 0);
+    particleSystemFireOrigin.gravity = new BABYLON.Vector3(0, 1.4, 0);
 
     // Angular speed, in radians
     particleSystemFireOrigin.minAngularSpeed = 0;
@@ -222,7 +244,7 @@ function FireParticles(emitter, inOptions) {
     particleSystemFireOrigin.minEmitPower = 0;
     particleSystemFireOrigin.maxEmitPower = 0;
     particleSystemFireOrigin.updateSpeed = 0.04;
-    particleSystemFireOrigin.targetStopDuration = 2.5;
+    particleSystemFireOrigin.targetStopDuration = 2.0;
 
     //change start position function
   /*  var walkPS = 0;

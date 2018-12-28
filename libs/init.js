@@ -1,7 +1,9 @@
 if (BABYLON.Engine.isSupported()) {
     var canvas = document.querySelector("#renderCanvas");
     var engine = new BABYLON.Engine(canvas, true, { stencil: true }, false);
-    engine.disableManifestCheck = true;
+    // engine.disableManifestCheck = true;
+
+    BABYLON.Database.IDBStorageEnabled = true;
 
     var genCombination = new GenerateWinCombination(5,3,12);
 
@@ -25,10 +27,11 @@ if (BABYLON.Engine.isSupported()) {
         // var available = ['-astc.ktx', '-dxt.ktx', '-pvrtc.ktx', '-etc1.ktx', '-etc2.ktx'];
         // var formatUsed = engine.setTextureFormatToUse(available);
 
-        var loadingScreen = new CustomLoadingScreen("textures/babylonjs.mp4");
+        var loadingScreen = new CustomLoadingScreen();
         engine.loadingScreen = loadingScreen;
 
         var scene = new BABYLON.Scene(engine);
+        scene.database = new BABYLON.Database('scene', function()  {});
         scene.clearColor = new BABYLON.Color4(0.3,0.3,0.4, 0.75);
         scene.shadowsEnabled = true;
      /*   scene.debugLayer.show({
@@ -96,7 +99,9 @@ if (BABYLON.Engine.isSupported()) {
         planeSpiderWeb.position.z = -0.3;
         planeSpiderWeb.position.y = 0.34;
         var materialSpiderWeb = new BABYLON.StandardMaterial("materialSpiderWeb", scene);
-        materialSpiderWeb.diffuseTexture = new BABYLON.Texture("textures/spiderweb/web.png", scene);
+        // 07122018
+        // 08112018
+        materialSpiderWeb.diffuseTexture = new BABYLON.Texture("textures/spiderweb/web.png?07122018", scene);
         materialSpiderWeb.diffuseColor = brightness;
         materialSpiderWeb.opacityTexture = materialSpiderWeb.diffuseTexture;
         planeSpiderWeb.material = materialSpiderWeb;
@@ -137,7 +142,7 @@ if (BABYLON.Engine.isSupported()) {
         var camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, new BABYLON.Vector3(0, 7, 43), scene);
         scene.showFps();
         camera.setTarget(new BABYLON.Vector3(0, -2.5, 0));
-        // camera.attachControl(canvas, false);
+        camera.attachControl(canvas, false);
 
         camera.lowerRadiusLimit = 35;
         camera.upperRadiusLimit = 50;
@@ -172,19 +177,21 @@ if (BABYLON.Engine.isSupported()) {
 /////////////////////// postprocessing
         // Create default pipeline
         var defaultPipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [camera]);
-        // defaultPipeline.brightThreshold = 0.8;
-        // var curve = new BABYLON.ColorCurves();
-        // curve.globalHue = 200;
-        // curve.globalDensity = 80;
-        // curve.globalSaturation = 80;
-        // curve.highlightsHue = 100;
-        // curve.highlightsDensity = 80;
-        // curve.highlightsSaturation = -80;
-        // curve.shadowsHue = 2;
-        // curve.shadowsDensity = 80;
-        // curve.shadowsSaturation = 40;
-        // defaultPipeline.imageProcessing.colorCurves = curve;
-        // defaultPipeline.depthOfField.focalLength = 150;
+        defaultPipeline.brightThreshold = 0.8;
+        var curve = new BABYLON.ColorCurves();
+        curve.globalHue = 220;
+        curve.globalDensity = 55;
+        curve.globalSaturation = 30;
+
+        curve.highlightsHue = 50;
+        curve.highlightsDensity = 60;
+        curve.highlightsSaturation = -60;
+        //
+        curve.shadowsHue = 200;
+        curve.shadowsDensity = 10;
+        curve.shadowsSaturation = 10;
+        scene.imageProcessingConfiguration.colorCurvesEnabled = true;
+        scene.imageProcessingConfiguration.colorCurves = curve;
 
         defaultPipeline.samples = 2;
         defaultPipeline.fxaaEnabled = true;
@@ -193,20 +200,22 @@ if (BABYLON.Engine.isSupported()) {
 
         // defaultPipeline.bloomEnabled = true;
         // defaultPipeline.bloomKernel = 10;
-        // defaultPipeline.bloomWeight = 0.02;
-        // defaultPipeline.bloomThreshold = 0.01;
-        // defaultPipeline.bloomScale = 0.01;
+        // defaultPipeline.bloomWeight = 0.2;
+        // defaultPipeline.bloomThreshold = 0.1;
+        // defaultPipeline.bloomScale = 0.1;
         //
         // defaultPipeline.depthOfFieldEnabled = true;
-        // defaultPipeline.depthOfFieldDistance = 100;
+        // defaultPipeline.depthOfFieldDistance = 1000;
+        // defaultPipeline.depthOfFieldBlurLevel = 0.001;
         //
-        // defaultPipeline.sharpenEnabled = true;
-        // defaultPipeline.sharpen.edgeAmount = 0.1;
-        // defaultPipeline.sharpen.colorAmount = 1.0;
+        defaultPipeline.sharpenEnabled = true;
+        defaultPipeline.sharpen.edgeAmount = 0.01;
+        defaultPipeline.sharpen.colorAmount = 1.0;
 
         // defaultPipeline.grainEnabled = true;
         // defaultPipeline.grain.intensity = 5;
         // defaultPipeline.grain.animated = true;
+
 ////////////////// SOUNDS
         var introSound = new BABYLON.Sound("introSound", "sounds/intro.mp3", scene);
         introSound.setVolume(0.75);
@@ -480,9 +489,14 @@ if (BABYLON.Engine.isSupported()) {
                 plugin.compileShadowGenerators = true;
             }
         });
-
+        BABYLON.DracoCompression.Configuration = {
+            decoder: {
+                wasmUrl: "libs/vendor/draco/draco_decoder_gltf.js",
+                wasmBinaryUrl: "libs/vendor/draco/draco_decoder_gltf.wasm"
+            }
+        };
         Promise.all([
-            BABYLON.SceneLoader.ImportMesh("", "models/anim/", "anim.gltf", scene, function (newMeshes, particleSystems, skeletons) {
+            BABYLON.SceneLoader.ImportMesh("", "models/anim/", "anim.glb", scene, function (newMeshes, particleSystems, skeletons) {
                 animationGroupPirate.object = newMeshes[0];
                 newMeshes[0].position.x = 31.0;
                 newMeshes[0].position.y = -18.5;
@@ -508,7 +522,7 @@ if (BABYLON.Engine.isSupported()) {
                 scene.animationGroups[3].start(true);
                 currentGroup = scene.animationGroups[3];
             }),
-            BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.gltf", scene, function (newMeshes) {
+            BABYLON.SceneLoader.ImportMesh("", "models/compass/", "compass.glb", scene, function (newMeshes) {
                 newMeshes[0].name = "compass";
                 newMeshes[0].position = freeSpin.anchor.position.clone();
                 newMeshes[0].position.x -= 0.3;
@@ -522,7 +536,7 @@ if (BABYLON.Engine.isSupported()) {
                 });
                 freeSpin.compass = {arrow: newMeshes[1], cup: newMeshes[3]};
             }),
-        BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.gltf", scene, function (newMeshes) {
+        BABYLON.SceneLoader.ImportMesh("", "models/lines/", "lines.glb", scene, function (newMeshes) {
             rightCheckWinLines = newMeshes[1];
             rightCheckWinLines._children.map(v => {
                     var mat = v.material.clone();
@@ -548,7 +562,7 @@ if (BABYLON.Engine.isSupported()) {
             planeSpiderWeb.parent = rightCheckWinLines;
         }),
 
-        BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.gltf", scene, function (newMeshes) {
+        BABYLON.SceneLoader.ImportMesh("", "models/credit/", "credit.glb", scene, function (newMeshes) {
             newMeshes[0].name = "credit";
             newMeshes[0].scaling = new BABYLON.Vector3(-4.5, 4.5, 4.5);
             newMeshes[0].position.x = 22;
@@ -603,14 +617,14 @@ if (BABYLON.Engine.isSupported()) {
             round.position.x = 0;
             round.position.y = 15;
             round.position.z = -20;
-            round.rotation.y = 0.2;
-            round.rotation.z = 0.0872664626*1.25;
+            // round.rotation.y = 0.2;
+            round.rotation.z = 0.01872664626*1.25;
             roundScore.anchor.parent = round;
             roundScore.anchor.scaling = new BABYLON.Vector3(-5/7, 1, 1);
             planeSpiderWeb1.parent = round;
         }),
 
-        BABYLON.SceneLoader.ImportMesh("", "models/1/", "chest.gltf", scene, function (newMeshes, ps1s, skeletons) {
+        BABYLON.SceneLoader.ImportMesh("", "models/chest/", "chest.glb", scene, function (newMeshes, ps1s, skeletons) {
             newMeshes[0].name = "chest";
             newMeshes[0].position.y = -10.648;
             newMeshes[0].position.z = -29;
@@ -768,7 +782,7 @@ if (BABYLON.Engine.isSupported()) {
                 }
             });
 
-            BABYLON.SceneLoader.ImportMesh("", "models/", "diamond.gltf", scene, function (newMeshes) {
+            BABYLON.SceneLoader.ImportMesh("", "models/symbols/", "symbols.glb", scene, function (newMeshes) {
                /* newMeshes[0]._children.map(v => {
                     console.log(v.name);
                 });*/
@@ -882,8 +896,10 @@ if (BABYLON.Engine.isSupported()) {
             });*/
 
             scene.executeWhenReady(function () {
+                scene.executeOnceBeforeRender(function () {
+                    optimizer.start();
+                });
                 engine.hideLoadingUI();
-                optimizer.start();
                 OpenChest.call(newMeshes[16], new BABYLON.Vector3(0,-Math.PI*0.4,0), 15);
                 credit.setTextForAnimation(genCombination.totalScore.toString());
                 bet.setTextForAnimation(genCombination.getTotalBet().toString());
@@ -952,7 +968,9 @@ if (BABYLON.Engine.isSupported()) {
                     }*/
                 });
                         // console.log(scene.animationGroups);
-
+                engine.runRenderLoop(function () {
+                    scene.render();
+                });
             });
             // Wiring
             optimizer.onSuccessObservable.add(function () {
@@ -1120,18 +1138,19 @@ if (BABYLON.Engine.isSupported()) {
             objCheckLine.material.emissiveIntensity = 0.0;
         }
 
+        // scene.clearCachedVertexData();
+        // scene.cleanCachedTextureBuffer();
+
         return scene;
     };
 
-    var scene = createScene();
 
-    engine.runRenderLoop(function () {
-        scene.render();
-    });
+    var scene = createScene();
 
     window.addEventListener("resize", function () {
         engine.resize();
     });
+
     /*window.onbeforeunload = function (event) {
         var message = 'Important: Please click on \'Save\' button to leave this page.';
         if (typeof event == 'undefined') {
